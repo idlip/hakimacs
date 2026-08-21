@@ -2,8 +2,7 @@
   resolve-icon: per-item icon override, shared by every branch of topic-list.html.
   Input:  dict "item" (parse-dl result) "iconsMap" (site.Params.<icons_param>) "fallback" (nf glyph)
   Return: nf glyph string
-  */
--}}
+  */ -}}
 {{- $result := .fallback -}}
 {{- range .item.parts -}}
   {{- $p := strings.TrimSpace . -}}

@@ -222,10 +222,8 @@
           <span class="menu-shortcut">0</span>
         </button>
         <div class="menu-separator" role="separator"></div>
-        {{- /* menuitemcheckbox, not menuitem: this is a toggle, and aria-pressed is
-          not valid on a menuitem. updatePinLabel() in menu.js keeps aria-checked
-          in sync here and aria-pressed on the two plain pin buttons. */
-        -}}
+        {{- /* menuitemcheckbox, not menuitem: this is a toggle, and aria-pressed is not valid on a menuitem. */ -}}
+        {{- /* updatePinLabel() in menu.js keeps aria-checked in sync here and aria-pressed on the two plain pin buttons. */ -}}
         <button
           class="menu-dropdown-item"
           role="menuitemcheckbox"

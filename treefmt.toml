@@ -11,9 +11,8 @@ includes = [
   "exampleSite/**/*.yaml",
 ]
 
-[formatter.prettier-templates]
-command = "prettier-gotmpl"
-options = ["--write"]
+[formatter.gotmplfmt]
+command = "gotmplfmt"
 includes = ["layouts/**/*.html", "layouts/**/*.js"]
 
 [formatter.toml]

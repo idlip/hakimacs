@@ -6,8 +6,7 @@
   name  — link text, tags stripped, HTML-unescaped
   desc  — first segment before " | "
   parts — slice of remaining " | "-split segments (trimmed), for caller to parse
-  */
--}}
+  */ -}}
 {{- $dt   := .dt -}}
 {{- $dd   := .dd -}}
 {{- $url  := $dt | replaceRE `(?s).*<a href="?([^ ">]+)"?.*` "$1" -}}

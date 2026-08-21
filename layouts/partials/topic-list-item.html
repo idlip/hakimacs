@@ -1,13 +1,11 @@
 {{- /*
   topic-list-item: unified listing item.
   Input: dict "e" (parse-dl result) "icon" (nf glyph) "chipColor" (base16 var name e.g. "base0E")
-  */
--}}
+  */ -}}
 {{- $chipColor := .chipColor -}}
 
 {{- /* Full-line search haystack: name + desc + every "key: value" part, plain-text, lowercase.
-  Powers #topic-search in topic-list-js.html (plain substring match, no JS change needed). */
--}}
+  Powers #topic-search in topic-list-js.html (plain substring match, no JS change needed). */ -}}
 {{- $searchText := printf "%s %s %s" .e.name .e.desc (delimit .e.parts " ") | plainify | lower -}}
 
 {{- /* Pre-scan parts for ref: key to build backlinks before rendering header */ -}}

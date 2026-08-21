@@ -4,8 +4,7 @@
   Each entry: label, url, icon (nerd-font glyph directly), optional rel (e.g. "me").
   Optional param: layout="grid" renders a responsive grid instead of the
   default vertical list. Usage: social-links with layout="grid".
-  */
--}}
+  */ -}}
 <div class="social-links{{ if eq (.Get "layout") "grid" }}is-grid{{ end }}">
   {{- range .Site.Params.socialLinks }}
     {{- $rel := "noopener noreferrer" -}}

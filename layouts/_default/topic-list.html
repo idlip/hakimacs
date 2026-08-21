@@ -8,9 +8,7 @@
     show_console — truthy: show wander launch button (uses .Params.wanderconsoles)
     list_label   — label for the flat-list divider (e.g. "↝ Known Sites"); optional
     chip_color   — base16 var name e.g. "base0E"; sets --chip-color on chip row
-    buffer_name  — override modeline buffer name; default: first word of title
-    */
-  -}}
+    buffer_name  — override modeline buffer name; default: first word of title */ -}}
   {{- $iconsParam := .Params.icons_param | default "tagicons" -}}
   {{- $iconsMap   := index site.Params $iconsParam | default (dict) -}}
   {{- $chipColor   := .Params.chip_color | default "" -}}

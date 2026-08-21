@@ -91,8 +91,7 @@
   {{- end }}
 {{- end }}
 {{- /* OG image: explicit page param → per-post rasterized PNG → site default.
-  The PNG at static/og/<slug>.png is produced by `just og` (rsvg-convert). */
--}}
+  The PNG at static/og/<slug>.png is produced by `just og` (rsvg-convert). */ -}}
 {{- $ogImage := "" -}}
 {{- with .Params.images }}{{ $ogImage = index . 0 }}{{ end -}}
 {{- if and (not $ogImage) (or .IsPage .IsSection) -}}
@@ -175,8 +174,7 @@
 
 {{- /* Schemes JSON for command palette "t " mode — fingerprinted, lazy-loaded.
   Sourced from the merged base16 + custom list (all-schemes.html) so
-  custom schemes (haki) show up in the picker automatically. */
--}}
+  custom schemes (haki) show up in the picker automatically. */ -}}
 {{- $sl := slice -}}
 {{- range partial "all-schemes.html" . -}}
   {{- $sl = $sl | append (dict "key" .key "name" .name "colors" .colors) -}}
@@ -184,16 +182,14 @@
 {{- $sr := resources.FromString "js/schemes-data.json" ($sl | jsonify) | fingerprint -}}
 
 {{- /* Preset scheme keys, so the pre-paint script can pick the random one
-  itself instead of leaving it to deferred app.js (which repainted). */
--}}
+  itself instead of leaving it to deferred app.js (which repainted). */ -}}
 {{- $schemeKeys := slice -}}
 {{- range .Site.Params.colorSchemes }}
   {{ $schemeKeys = $schemeKeys | append .name }}
 {{ end -}}
 
 {{- /* Pre-paint script: theme + scheme applied before paint so the final
-  scheme is right on the first paint (no repaint flash). */
--}}
+  scheme is right on the first paint (no repaint flash). */ -}}
 <script>
   window.__schemesUrl = "{{ $sr.RelPermalink }}";
   (function() {
@@ -242,8 +238,7 @@
 
 {{- /* Prerender same-origin links on hover for near-instant forward nav.
   Native Speculation Rules; no library. Absolute external URLs don't match
-  the leading-slash pattern, so only in-site links are prerendered. */
--}}
+  the leading-slash pattern, so only in-site links are prerendered. */ -}}
 <script type="speculationrules">
   {
     "prerender": [

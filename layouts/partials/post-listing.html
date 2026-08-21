@@ -1,8 +1,7 @@
 {{- /*
   post-listing partial — shared by list.html and the index.html fallback.
   Handles home, section, and term page kinds.
-  */
--}}
+  */ -}}
 {{- $allPages := .RegularPages.ByDate.Reverse -}}
 {{- if eq .Kind "home" -}}
   {{- $allPages = (where .Site.RegularPages "Section" "posts").ByDate.Reverse -}}

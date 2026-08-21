@@ -3,8 +3,7 @@
   Returns the menu swatch style "--p-bg:..;--p-fg:..;--p-accent:..".
   Derives from the base16 yaml (base00/base05/base0D) when the entry has a
   `dark` key; otherwise uses the entry's explicit bg/fg/accent (haki, Modus).
-  */
--}}
+  */ -}}
 {{- $e := . -}}
 {{- $bg := $e.bg -}}{{- $fg := $e.fg -}}{{- $accent := $e.accent -}}
 {{- with $e.dark -}}
