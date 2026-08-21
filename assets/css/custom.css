@@ -1,0 +1,54 @@
+/* Theme default fonts + heading accents.
+ *
+ * This file makes the theme self-contained: head.html bundles `css/custom.css`,
+ * and Hugo resolves it here unless your site provides its own. To customize,
+ * mount your own `assets/css/custom.css` at the SITE root — the project copy
+ * wins over this theme copy (last in the CSS pipeline, project beats theme).
+ *
+ * No web fonts are bundled; these are system stacks. Drop @font-face rules in
+ * your own custom.css to use bespoke fonts. */
+
+:root {
+  --heading-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --code-font:
+    ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", Menlo, Consolas,
+    monospace;
+  --serif-font: Georgia, "Times New Roman", serif;
+}
+
+/* Headings use the heading font; body inherits --body-font-family (set per
+   font-mode in themes.css). Keep code monospace even in sans/serif modes. */
+article :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--heading-font);
+}
+pre,
+code,
+kbd,
+samp,
+.highlight {
+  font-family: var(--code-font);
+}
+
+/* Heading prefix glyphs — plain Unicode, no special font required. Colors map
+   to the active base16 scheme so they adapt to every palette. */
+article h1 {
+  text-align: center;
+}
+article h1::before,
+article h1::after {
+  content: " ⩮ ";
+  color: var(--magenta);
+}
+article h2::before {
+  content: "◉ ";
+  color: var(--blue);
+}
+article h3::before {
+  content: "◈ ";
+  color: var(--cyan);
+}
+article h4::before {
+  content: "✥ ";
+  color: var(--green);
+}
