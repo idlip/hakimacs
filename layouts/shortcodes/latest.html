@@ -1,0 +1,11 @@
+{{- /*
+  latest shortcode — links the newest post in /posts/ (title + date).
+  Uses `first 1` + range so it is safe when there are no posts yet.
+  Drop it into content as a shortcode named "latest".
+  */
+-}}
+{{- range (first 1 (where .Site.RegularPages "Section" "posts").ByDate.Reverse) -}}
+  &#8594;
+  <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+  ({{ .Date.Format "02 Jan 2006" }})
+{{- end -}}

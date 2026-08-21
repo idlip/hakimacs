@@ -1,0 +1,15 @@
+{{- /* Per-post OG image source (rasterized to /og/<slug>.png by `just og`).
+       Renders through the shared og-card partial. */ -}}
+{{- $ex := .Description -}}{{- if not $ex -}}{{- $ex = .Summary | plainify -}}{{- end -}}
+{{- $fav := "" -}}{{- with .Site.Params.favicon -}}{{- $fav = resources.Get (. | strings.TrimPrefix "/") -}}{{- end -}}
+{{- partial "og-card.svg" (dict
+  "title" .Title
+  "excerpt" $ex
+  "tags" .Params.tags
+  "slug" .File.ContentBaseName
+  "date" (.Date.Format "2006-01-02")
+  "metaRight" (printf "%d words · %d min" .WordCount .ReadingTime)
+  "siteTitle" .Site.Title
+  "ogfont" (.Site.Params.ogFont | default "monospace")
+  "favicon" $fav
+) -}}

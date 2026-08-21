@@ -1,0 +1,91 @@
+<script>
+  (function () {
+    "use strict";
+    var list = document.getElementById("article-list");
+    if (!list) return;
+
+    /* ── list / grid view toggle (persisted across topic pages) ── */
+    var vbtn = document.getElementById("view-toggle");
+    if (vbtn) {
+      var VIEW_KEY = "topic-view";
+      var applyView = function (v) {
+        var grid = v === "grid";
+        list.classList.toggle("is-grid", grid);
+        vbtn.classList.toggle("active", grid);
+        vbtn.setAttribute("aria-pressed", grid ? "true" : "false");
+      };
+      applyView(localStorage.getItem(VIEW_KEY) || "list");
+      vbtn.addEventListener("click", function () {
+        var v = list.classList.contains("is-grid") ? "list" : "grid";
+        localStorage.setItem(VIEW_KEY, v);
+        applyView(v);
+      });
+    }
+
+    function groupItems(divider) {
+      var items = [];
+      var el = divider.nextElementSibling;
+      while (el && !el.classList.contains("year-divider")) {
+        if (el.classList.contains("article-item")) items.push(el);
+        el = el.nextElementSibling;
+      }
+      return items;
+    }
+
+    /* ── search ── */
+    var inp = document.getElementById("topic-search");
+    var count = document.getElementById("topic-count");
+    if (!inp) return;
+
+    function run(raw) {
+      var q = raw.toLowerCase().trim();
+      /* orderless: every space-separated token must appear somewhere, any order */
+      var tokens = q ? q.split(/\s+/) : [];
+      var n = 0;
+
+      list.querySelectorAll(".topic-item[data-title]").forEach(function (el) {
+        var hay = el.dataset.title || "";
+        var ok =
+          !q ||
+          tokens.every(function (t) {
+            return hay.indexOf(t) !== -1;
+          });
+        el.dataset.searchHidden = ok ? "" : "1";
+        el.style.display = q ? (ok ? "" : "none") : "";
+        if (ok) n++;
+      });
+
+      list.querySelectorAll(".year-divider").forEach(function (div) {
+        var hasVisible = groupItems(div).some(function (el) {
+          return el.style.display !== "none";
+        });
+        div.style.display = hasVisible ? "" : "none";
+      });
+
+      if (count)
+        count.textContent = q ? n + " match" + (n !== 1 ? "es" : "") : "";
+    }
+
+    inp.addEventListener("input", function () {
+      run(this.value);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (
+        e.key === "/" &&
+        document.activeElement !== inp &&
+        document.activeElement.tagName !== "INPUT" &&
+        document.activeElement.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        inp.focus();
+        inp.select();
+      }
+      if (e.key === "Escape" && document.activeElement === inp) {
+        inp.value = "";
+        run("");
+        inp.blur();
+      }
+    });
+  })();
+</script>

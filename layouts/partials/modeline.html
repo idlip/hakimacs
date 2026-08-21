@@ -1,0 +1,82 @@
+{{- /*
+  Modeline partial — Emacs-inspired status bar
+  Parameters:
+  - .buffer      : buffer name (filename.org or *buffer*)
+  - .title       : page title (shown on mobile instead of filename)
+  - .wordcount   : optional word count integer
+  - .readingtime : optional reading time in minutes
+  - .date        : optional publication date string (YYYY-MM-DD)
+  - .widthtoggle : true to show the width-cycle button (post pages only)
+  - .progress    : true to render the reading-progress bar hugging the modeline's
+  top edge (post pages with enough content). Pure CSS
+  (animation-timeline: scroll(root)) :: no JS drives it.
+  */
+-}}
+
+{{- $buffer := .buffer | default "*scratch*" -}}
+{{- $title := .title | default "" -}}
+{{- $wc := .wordcount | default 0 -}}
+{{- $rt := .readingtime | default 0 -}}
+{{- $date := .date | default "" -}}
+{{- $widthtoggle := .widthtoggle | default false -}}
+{{- $progress := .progress | default false -}}
+
+
+<div class="modeline" role="status">
+  {{- if $progress }}
+    <div class="read-progress" id="read-progress" aria-hidden="true"></div>
+  {{ end }}
+  <div class="ml-left">
+    {{- if $date -}}
+      <span class="ml-group ml-hide-mobile">
+        <span class="nf ml-date-icon" aria-hidden="true"> </span
+        ><time class="ml-date" datetime="{{ $date }}"> {{ $date }}</time>
+      </span>
+      <span class="ml-sep ml-hide-mobile" aria-hidden="true">·</span>
+    {{- end }}
+
+
+    <span class="ml-group">
+      <button
+        class="ml-buffer"
+        data-action="open-palette"
+        title="Open command palette (x)"
+      >
+         {{ ($title | default $buffer) | truncate 80 }}
+      </button>
+    </span>
+
+    {{- if $rt }}
+      <span class="ml-sep" aria-hidden="true">·</span>
+      <span class="ml-readtime ml-hide-mobile"> {{ $rt }} min</span>
+    {{- end }}
+
+    {{- if $wc }}
+      <span class="ml-sep" aria-hidden="true">·</span>
+      <span class="ml-wc">{{ $wc }}w</span>
+    {{- end }}
+
+  </div>
+
+  <span class="ml-fill" aria-hidden="true"></span>
+
+  <div class="ml-right">
+    <button
+      class="ml-pin-btn ml-hide-mobile"
+      id="ml-pin-btn"
+      data-action="fix-scheme"
+      aria-pressed="false"
+      title="Pin / unpin color scheme"
+    >
+      <span id="ml-pin-label">Pin</span>
+    </button>
+    <button
+      class="ml-echo-msg"
+      id="echo-message"
+      data-action="show-help"
+      title="Keyboard shortcuts — click or press ?"
+    >
+      ? help
+    </button>
+  </div>
+</div>

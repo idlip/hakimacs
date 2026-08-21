@@ -1,0 +1,39 @@
+{{ define "main" }}
+{{- /* 404 buffer — same shell as single.html/index.html (.buffer/.post-content/
+       .post-body), so it inherits current theme.css, font mode, and the
+       modeline/palette chrome instead of stale fork-era markup. */ -}}
+<section class="buffer buffer-content active"
+         id="buffer-content"
+         role="region"
+         aria-label="Page not found">
+  <div class="buffer-body">
+    <article class="post-content">
+      <div class="post-header">
+        <h1 class="post-title">Page not found</h1>
+      </div>
+
+      <div class="post-body">
+        <p><code>Symbol's value as variable is void: {{ .RelPermalink }}</code></p>
+
+        <p>This page doesn't exist :: not now, not ever, not in any buffer. Even <b>Roronoa Zoro</b> would've found his way here faster. Here's where you probably meant to go:</p>
+
+        <ul>
+          <li><a href="{{ "/" | relLangURL }}">Home</a> <kbd>g</kbd> <kbd>h</kbd></li>
+          <li><a href="{{ "/posts/" | relLangURL }}">Posts</a> <kbd>g</kbd> <kbd>p</kbd></li>
+          <li>
+            Latest:
+            {{- range (first 1 (where .Site.RegularPages "Section" "posts").ByDate.Reverse) }}
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a> ({{ .Date.Format "02 Jan 2006" }})
+            {{- end }}
+          </li>
+        </ul>
+
+        <p>Or open the command palette for everything else:</p>
+        <button type="button" class="tag-cloud-btn center" data-action="open-palette">M-x (:Command palette)</button>
+      </div>
+    </article>
+  </div>
+
+  {{ partial "modeline.html" (dict "buffer" "*Messages*") }}
+</section>
+{{ end }}

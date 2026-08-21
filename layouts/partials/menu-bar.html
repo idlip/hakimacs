@@ -1,0 +1,352 @@
+<header class="menu-bar">
+  {{- /* Hamburger — mobile only */ -}}
+  <button class="menu-hamburger" aria-label="Toggle menu" aria-expanded="false">
+    <span aria-hidden="true">&#9776;</span>
+  </button>
+
+  <nav class="menu-items" role="menubar" aria-label="Site navigation">
+    {{- /* Buffers Menu — driven by menu.main in config.yaml */ -}}
+    <div class="menu-item" role="none">
+      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+        <span class="underline">B</span>uffers
+      </button>
+      <div class="menu-dropdown" role="menu">
+        {{- range .Site.Menus.main }}
+          <a
+            href="{{ .URL | relURL }}"
+            class="menu-dropdown-item"
+            role="menuitem"
+          >
+            <span>{{ .Name }}</span>
+          </a>
+        {{- end }}
+        <div class="menu-separator" role="separator"></div>
+        <a
+          href="{{ "/tags/" | relURL }}"
+          class="menu-dropdown-item"
+          role="menuitem"
+        >
+          <span>Tags</span>
+        </a>
+        {{ with .OutputFormats.Get "RSS" -}}
+          <div class="menu-separator" role="separator"></div>
+          <a
+            href="{{ .RelPermalink }}"
+            class="menu-dropdown-item"
+            role="menuitem"
+            target="_blank"
+          >
+            <span>RSS Feed</span>
+          </a>
+        {{- end }}
+      </div>
+    </div>
+
+    {{- /* View Menu */ -}}
+    <div class="menu-item" role="none">
+      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+        <span class="underline">V</span>iew
+      </button>
+      <div class="menu-dropdown" role="menu">
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="toggle-theme"
+        >
+          <span>Toggle Dark/Light</span>
+          <span class="menu-shortcut">t</span>
+        </button>
+        <div class="menu-separator" role="separator"></div>
+        {{- if .Site.Params.colorSchemes }}
+          {{- range .Site.Params.colorSchemes }}
+            <button
+              class="menu-dropdown-item scheme-option"
+              role="menuitem"
+              data-scheme="{{ .name }}"
+              style="{{ partial "scheme-swatch.html" . | safeCSS }}"
+            >
+              <span class="scheme-dot" aria-hidden="true"></span>
+              <span>{{ .label }}</span>
+            </button>
+          {{- end }}
+          <div class="menu-separator" role="separator"></div>
+        {{- end }}
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="increase-font"
+        >
+          <span>Increase Font Size</span>
+          <span class="menu-shortcut">+</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="decrease-font"
+        >
+          <span>Decrease Font Size</span>
+          <span class="menu-shortcut">-</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="reset-font"
+        >
+          <span>Reset Font Size</span>
+          <span class="menu-shortcut">0</span>
+        </button>
+      </div>
+    </div>
+
+    {{- /* Help Menu */ -}}
+    <div class="menu-item" role="none">
+      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+        <span class="underline">H</span>elp
+      </button>
+      <div class="menu-dropdown" role="menu">
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="show-help"
+        >
+          <span>Keyboard Shortcuts</span>
+          <span class="menu-shortcut">?</span>
+        </button>
+        <div class="menu-separator" role="separator"></div>
+        <a
+          href="{{ "/about/" | relURL }}"
+          class="menu-dropdown-item"
+          role="menuitem"
+        >
+          <span>About</span>
+        </a>
+        {{- with .Site.Params.socialLinks }}
+          <div class="menu-separator" role="separator"></div>
+          {{- range . }}
+            {{- $rel := "noopener noreferrer" -}}
+            {{- with .rel }}{{- $rel = printf "%s %s" $rel . -}}{{- end -}}
+            <a
+              href="{{ .url }}"
+              class="menu-dropdown-item"
+              role="menuitem"
+              {{- if not (hasPrefix .url "mailto:") }}
+                target="_blank" rel="{{ $rel }}"
+              {{ end }}
+            >
+              <span class="nf">{{ .icon }}</span>
+              <span>{{ .label }}</span>
+            </a>
+          {{- end }}
+        {{- end }}
+      </div>
+    </div>
+
+    {{- /* M-x Command Menu — all JS-callable actions */ -}}
+    <div class="menu-item" role="none">
+      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+        <span class="underline">M</span>-x
+      </button>
+      <div class="menu-dropdown" role="menu">
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="open-palette"
+        >
+          <span>Open Command Palette</span>
+          <span class="menu-shortcut">x</span>
+        </button>
+        <div class="menu-separator" role="separator"></div>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="toggle-theme"
+        >
+          <span>Toggle Dark/Light</span>
+          <span class="menu-shortcut">t</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="cycle-font"
+        >
+          <span>Cycle Font Mode</span>
+          <span class="menu-shortcut">f</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="cycle-width"
+        >
+          <span>Cycle Content Width</span>
+          <span class="menu-shortcut">w</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="cycle-align"
+        >
+          <span>Cycle Text Alignment</span>
+          <span class="menu-shortcut">a</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="browse-schemes"
+        >
+          <span>Browse All Schemes</span>
+          <span class="menu-shortcut">t[sp]</span>
+        </button>
+        <div class="menu-separator" role="separator"></div>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="increase-font"
+        >
+          <span>Increase Font Size</span>
+          <span class="menu-shortcut">+</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="decrease-font"
+        >
+          <span>Decrease Font Size</span>
+          <span class="menu-shortcut">-</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="reset-font"
+        >
+          <span>Reset Font Size</span>
+          <span class="menu-shortcut">0</span>
+        </button>
+        <div class="menu-separator" role="separator"></div>
+        {{- /* menuitemcheckbox, not menuitem: this is a toggle, and aria-pressed is
+          not valid on a menuitem. updatePinLabel() in menu.js keeps aria-checked
+          in sync here and aria-pressed on the two plain pin buttons. */
+        -}}
+        <button
+          class="menu-dropdown-item"
+          role="menuitemcheckbox"
+          aria-checked="false"
+          data-action="fix-scheme"
+        >
+          <span>Pin / Unpin Scheme</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="show-help"
+        >
+          <span>Keyboard Shortcuts</span>
+          <span class="menu-shortcut">?</span>
+        </button>
+        <button
+          class="menu-dropdown-item"
+          role="menuitem"
+          data-action="toggle-keys"
+        >
+          <span>Enable / disable shortcuts</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="menu-bar-right">
+    <a href="{{ "/posts/" | relURL }}" class="menu-bar-title"
+      >{{ .Site.Title }}</a
+    >
+
+    {{- /* Font cycle button */ -}}
+    <button
+      class="menu-bar-btn"
+      id="font-cycle-btn"
+      title="Cycle font: mono → sans → mixed"
+      aria-label="Cycle font mode"
+      data-action="cycle-font"
+    >
+      <span class="nf" aria-hidden="true"> </span>
+    </button>
+
+    {{- /* Width cycle button */ -}}
+    <button
+      class="menu-bar-btn"
+      id="ml-width-btn"
+      title="Cycle content width [100% → 80ch → 60ch → 840px] (w)"
+      aria-label="Cycle content width"
+      data-action="cycle-width"
+    >
+      <span class="nf" aria-hidden="true">󰭣 </span>
+    </button>
+
+    {{- /* Alignment cycle button (normal → justified → columns). Placeholder glyph. */ -}}
+    <button
+      class="menu-bar-btn"
+      title="Cycle text alignment [normal → justified → columns] (a)"
+      aria-label="Cycle text alignment"
+      data-action="cycle-align"
+    >
+      <span class="nf" aria-hidden="true">󰉢 </span>
+    </button>
+
+    {{- /* Scheme popup */ -}}
+    {{- if .Site.Params.colorSchemes }}
+      <div class="scheme-popup-container" id="scheme-popup-container">
+        <button
+          class="menu-bar-btn scheme-popup-btn"
+          id="scheme-popup-btn"
+          aria-label="Color scheme (c)"
+          title="Color scheme (c)"
+          aria-expanded="false"
+          aria-haspopup="true"
+        >
+          <span class="nf" aria-hidden="true"> </span>
+        </button>
+        <div
+          class="scheme-popup"
+          id="scheme-popup"
+          role="menu"
+          aria-label="Color schemes"
+        >
+          {{- range .Site.Params.colorSchemes }}
+            <button
+              class="menu-dropdown-item scheme-option"
+              role="menuitem"
+              data-scheme="{{ .name }}"
+              style="{{ partial "scheme-swatch.html" . | safeCSS }}"
+            >
+              <span class="scheme-dot" aria-hidden="true"></span>
+              <span>{{ .label }}</span>
+            </button>
+          {{- end }}
+          <div class="menu-separator" role="separator"></div>
+          <div class="scheme-popup-actions">
+            <button
+              class="scheme-action-btn"
+              id="pin-scheme-btn"
+              data-action="fix-scheme"
+              aria-pressed="false"
+              title="Pin: lock current scheme, or unpin to go random each session"
+            >
+              <span class="nf" aria-hidden="true">󰐅 </span>
+              <span id="pin-scheme-label">Pin</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    {{- end }}
+
+    {{- /* Theme toggle */ -}}
+    <button
+      class="menu-bar-btn"
+      aria-label="Toggle dark/light"
+      data-action="toggle-theme"
+      title="Toggle dark/light (t)"
+    >
+      <span class="nf theme-icon-dark" aria-hidden="true"></span>
+      <span class="nf theme-icon-light" aria-hidden="true"> </span>
+    </button>
+  </div>
+</header>
+<div class="menu-backdrop" id="menu-backdrop" aria-hidden="true"></div>

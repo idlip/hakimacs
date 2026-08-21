@@ -1,0 +1,38 @@
+{{ define "main" }}
+{{- /* Home renders content/_index.org as a *home* buffer. The landing's
+       structure (intro, feature buttons, section + key tables) lives in that
+       org file, so the page is content-driven with no bespoke layout. Falls
+       back to the post listing if there is no content. */ -}}
+{{- if .Content }}
+<section class="buffer buffer-content active"
+         id="buffer-content"
+         role="region"
+         aria-label="Home">
+  <div class="buffer-body">
+    <article class="post-content">
+      {{- /* Title as an h1, same as single pages (no post-meta on the home). */ -}}
+      <div class="post-header">
+        <h1 class="post-title">{{ .Title }}</h1>
+      </div>
+      {{- /* .post-body so home prose reads like a post body and responds to the
+             `a` alignment cycle (normal / justify / columns). */ -}}
+      <div class="post-body">{{ .Content |
+        replaceRE `(<img[^>]*\balt=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)</figcaption>` `${1}${3}${2}<figcaption>${3}</figcaption>` |
+        replaceRE `(<img[^>]*\btitle=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)</figcaption>` `${1}${3}${2}<figcaption>${3}</figcaption>` |
+        replaceRE `<img ` `<img loading="lazy" decoding="async" ` |
+        safeHTML }}</div>
+    </article>
+    <footer>{{ partial "footer" . }}</footer>
+  </div>
+
+  {{ partial "modeline.html" (dict
+    "buffer"   "*home*"
+    "mode"     "Org"
+    "readonly" true
+    "keyhint"  "<kbd>x</kbd> palette"
+  ) }}
+</section>
+{{- else }}
+{{ partial "post-listing.html" . }}
+{{- end }}
+{{ end }}

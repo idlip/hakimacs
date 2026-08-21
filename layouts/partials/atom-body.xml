@@ -1,0 +1,60 @@
+{{- $pctx := . -}}
+{{- if .IsHome -}}{{ $pctx = .Site }}{{- end -}}
+{{- $pages := slice -}}
+{{- if or $.IsHome $.IsSection -}}
+{{- $pages = $pctx.RegularPages -}}
+{{- else -}}
+{{- $pages = $pctx.Pages -}}
+{{- end -}}
+{{- $pages = where $pages "Params.draft" "ne" true -}}
+{{- $limit := .Site.Config.Services.RSS.Limit -}}
+{{- if ge $limit 1 -}}
+{{- $pages = $pages | first $limit -}}
+{{- end -}}
+{{- $authorEmail := .Site.Params.authorEmail -}}
+{{- $authorName  := .Site.Params.authorName -}}
+{{- printf "<?xml version=\"1.0\" encoding=\"utf-8\"?>" | safeHTML }}
+<feed xmlns="http://www.w3.org/2005/Atom"{{ with .Site.Language.Lang }} xml:lang="{{ . }}"{{ end }}>
+  <title>{{ .Site.Title }}</title>
+  {{ with .Description }}<subtitle>{{ . }}</subtitle>{{ else }}<subtitle>{{ .Site.Params.description }}</subtitle>{{ end }}
+  <link rel="alternate" type="text/html" href="{{ .Site.BaseURL }}" />
+  {{- with .OutputFormats.Get "RSS" }}
+  <link rel="self" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" />
+  {{- end }}
+  <id>{{ .Site.BaseURL }}</id>
+  {{- with $pages }}
+  <updated>{{ (index . 0).Lastmod.Format "2006-01-02T15:04:05Z07:00" | safeHTML }}</updated>
+  {{- end }}
+  {{- with $authorName }}
+  <author>
+    <name>{{ . }}</name>
+    {{- with $authorEmail }}
+    <email>{{ . }}</email>
+    {{- end }}
+  </author>
+  {{- end }}
+  <generator uri="https://gohugo.io/">Hugo</generator>
+  {{- with .Site.Params.favicon }}
+  <icon>{{ . | absURL }}</icon>
+  {{- end }}
+  {{- with .Site.Copyright }}
+  <rights>{{ . | markdownify | plainify }}</rights>
+  {{- end }}
+  {{- range $pages }}
+  <entry>
+    <title>{{ .Title | emojify }}</title>
+    <link rel="alternate" type="text/html" href="{{ .Permalink }}" />
+    <id>{{ .Permalink }}</id>
+    {{- if not .Date.IsZero }}
+    <published>{{ .Date.Format "2006-01-02T15:04:05Z07:00" | safeHTML }}</published>
+    {{- end }}
+    <updated>{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" | safeHTML }}</updated>
+    {{- with .Params.tags }}
+    {{- range . }}
+    <category term="{{ . | urlize }}" label="{{ . }}" scheme="{{ "tags/" | absURL }}" />
+    {{- end }}
+    {{- end }}
+    {{ printf `<content type="html"><![CDATA[%s]]></content>` .Content | safeHTML }}
+  </entry>
+  {{- end }}
+</feed>

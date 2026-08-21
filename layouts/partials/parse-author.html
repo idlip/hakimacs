@@ -1,0 +1,10 @@
+{{- /*
+  parse-author: given "Name (URL)" or just "Name", returns dict "name" "url".
+  url is "" when the input has no parenthesized URL.
+  */
+-}}
+{{- $author := . -}}
+{{- $name := replaceRE `^([^(]+)\(.*$` "$1" $author | strings.TrimSpace -}}
+{{- $url  := replaceRE `^[^(]+\(([^)]+)\).*$` "$1" $author -}}
+{{- $url  = cond (ne $url $author) $url "" -}}
+{{- return dict "name" $name "url" $url -}}

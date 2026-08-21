@@ -1,0 +1,24 @@
+{{- /*
+  social-links shortcode
+  Loops over [[params.socialLinks]] in config.toml.
+  Each entry: label, url, icon (nerd-font glyph directly), optional rel (e.g. "me").
+  Optional param: layout="grid" renders a responsive grid instead of the
+  default vertical list. Usage: social-links with layout="grid".
+  */
+-}}
+<div class="social-links{{ if eq (.Get "layout") "grid" }}is-grid{{ end }}">
+  {{- range .Site.Params.socialLinks }}
+    {{- $rel := "noopener noreferrer" -}}
+    {{- with .rel }}{{- $rel = printf "%s %s" $rel . -}}{{- end -}}
+    <a
+      class="social-link"
+      href="{{ .url }}"
+      {{- if not (hasPrefix .url "mailto:") }}
+        target="_blank" rel="{{ $rel }}"
+      {{ end }}
+    >
+      <span class="nf" aria-hidden="true">{{ .icon }}</span>
+      <span class="social-label">{{ .label }}</span>
+    </a>
+  {{- end }}
+</div>

@@ -1,0 +1,72 @@
+{{- /*
+  all-schemes: merges base16 (data/schemes/base16, submodule, untouched) with
+  custom schemes hand-written in assets/css/custom.css (@scheme comment
+  convention). Single source for both the "t " picker (head.html) and the
+  /themes gallery page.
+
+  Returns a slice of dict:
+  key, name, authorName, authorUrl, variant, colors (slice of 16 hex), source
+  */
+-}}
+{{- $BASE_KEYS := slice "base00" "base01" "base02" "base03" "base04" "base05" "base06" "base07" "base08" "base09" "base0A" "base0B" "base0C" "base0D" "base0E" "base0F" -}}
+{{- $out := slice -}}
+
+{{- /* -- base16: data/schemes/base16/*.yaml (submodule) -- */ -}}
+{{- range $k, $d := hugo.Data.schemes.base16 -}}
+  {{- $p := $d.palette -}}
+  {{- if $p -}}
+    {{- $colors := slice -}}
+    {{- range $bk := $BASE_KEYS -}}
+      {{- $colors = $colors | append (or (index $p $bk) (index $p (lower $bk)) | default "") -}}
+    {{- end -}}
+    {{- $a := partial "parse-author.html" ($d.author | default "") -}}
+    {{- $out = $out | append (dict
+      "key" $k
+      "name" ($d.name | default $k)
+      "authorName" $a.name
+      "authorUrl" $a.url
+      "variant" ($d.variant | default "")
+      "colors" $colors
+      "source" "base16"
+      )
+    -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* -- custom: assets/css/custom.css, @scheme comment convention -- */ -}}
+{{- $customCSS := resources.Get "css/custom.css" -}}
+{{- if $customCSS -}}
+  {{- $text := $customCSS.Content -}}
+  {{- $unitRe := `/\* @scheme:[^*]*\*/\s*\[data-scheme="[a-zA-Z0-9_-]+"\](?:\[data-theme="light"\])?\s*\{[^}]*\}` -}}
+  {{- range $unit := findRE $unitRe $text 50 -}}
+    {{- $meta    := replaceRE `(?s)/\* @scheme:\s*(.*?)\s*\*/.*` "$1" $unit -}}
+    {{- $key     := replaceRE `(?s).*\[data-scheme="([a-zA-Z0-9_-]+)"\].*` "$1" $unit -}}
+    {{- $isLight := in $unit `[data-theme="light"]` -}}
+    {{- $body    := replaceRE `(?s)^.*\{([^}]*)\}$` "$1" $unit -}}
+    {{- $fields  := split $meta "|" -}}
+    {{- $name    := strings.TrimSpace (index $fields 0) -}}
+    {{- $author  := strings.TrimSpace (index $fields 1) -}}
+    {{- $variant := strings.TrimSpace (index $fields 2) -}}
+    {{- $hexes   := findRE `--base0[0-9A-F]:\s*#[0-9a-fA-F]{6}` $body -}}
+    {{- $colors  := slice -}}
+    {{- range $hexes -}}
+      {{- $colors = $colors | append (replaceRE `^.*(#[0-9a-fA-F]{6}).*$` "$1" .) -}}
+    {{- end -}}
+    {{- if eq (len $colors) 16 -}}
+      {{- $a := partial "parse-author.html" $author -}}
+      {{- $dedupKey := cond $isLight (printf "%s-light" $key) $key -}}
+      {{- $out = $out | append (dict
+        "key" $dedupKey
+        "name" $name
+        "authorName" $a.name
+        "authorUrl" $a.url
+        "variant" $variant
+        "colors" $colors
+        "source" "custom"
+        )
+      -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- return $out -}}

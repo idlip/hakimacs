@@ -1,0 +1,101 @@
+{{- /* Shared OG card renderer (Emacs-window outline). Called by single.svg
+       (posts) and list.svg (sections). Returns a full <svg>; the caller's
+       whole output is this partial. Rasterized to PNG by `just og`.
+       dict params:
+         title      (string, required)
+         excerpt    (string; wrapped to <=5 lines; optional)
+         tags       (slice; first 3 shown as #tag; optional)
+         slug       (string; modeline *slug*; optional)
+         date       (string; modeline left, formatted; optional)
+         metaRight  (string; modeline right, e.g. "119 words · 1 min"; optional)
+         siteTitle  (string)
+         ogfont     (string; font-family, resolved by rsvg-convert/fontconfig from an installed TTF)
+         favicon    (resource; embedded as the corner logo; optional) */ -}}
+
+{{- /* title: wrapped to <=2 lines, sized by length */ -}}
+{{- $title := .title -}}{{- $tfs := 50 -}}{{- $twrap := 30 -}}
+{{- if gt (len $title) 52 -}}{{- $tfs = 38 -}}{{- $twrap = 40 -}}
+{{- else if gt (len $title) 28 -}}{{- $tfs = 44 -}}{{- $twrap = 34 -}}{{- end -}}
+{{- $tl := slice -}}{{- $cur := "" -}}
+{{- range $w := split $title " " -}}
+  {{- $try := cond (eq $cur "") $w (printf "%s %s" $cur $w) -}}
+  {{- if gt (len $try) $twrap -}}{{- $tl = $tl | append $cur -}}{{- $cur = $w -}}
+  {{- else -}}{{- $cur = $try -}}{{- end -}}
+{{- end -}}
+{{- if $cur -}}{{- $tl = $tl | append $cur -}}{{- end -}}
+{{- if gt (len $tl) 2 -}}{{- $tl = (first 1 $tl) | append (printf "%s…" (index $tl 1)) -}}{{- end -}}
+
+{{- /* tags: first 3, "#a  #b  #c" */ -}}
+{{- $tagparts := slice -}}
+{{- with .tags -}}{{- range first 3 . -}}{{- $tagparts = $tagparts | append (printf "#%s" .) -}}{{- end -}}{{- end -}}
+{{- $tagstr := delimit $tagparts "  " -}}
+
+{{- /* excerpt: <=62 chars, 5 lines, ellipsis if longer */ -}}
+{{- $el := slice -}}{{- $ecur := "" -}}
+{{- with .excerpt -}}
+{{- $ex := . | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
+{{- range $w := split $ex " " -}}
+  {{- $try := cond (eq $ecur "") $w (printf "%s %s" $ecur $w) -}}
+  {{- if gt (len $try) 62 -}}{{- $el = $el | append $ecur -}}{{- $ecur = $w -}}
+  {{- else -}}{{- $ecur = $try -}}{{- end -}}
+{{- end -}}
+{{- if $ecur -}}{{- $el = $el | append $ecur -}}{{- end -}}
+{{- end -}}
+{{- $emore := gt (len $el) 5 -}}{{- $el = first 5 $el -}}
+{{- if $emore -}}{{- $el = (first 4 $el) | append (printf "%s…" (index $el 4)) -}}{{- end -}}
+
+{{- $titleTop := 180 -}}
+{{- $titleLast := add $titleTop (mul (sub (len $tl) 1) (add $tfs 12)) -}}
+{{- $tagsY := add $titleLast 50 -}}
+{{- $exTop := cond (gt (len $tagparts) 0) (add $tagsY 52) (add $titleLast 56) -}}
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="{{ .ogfont }}, monospace">
+  <defs>
+    <clipPath id="favclip"><rect x="1074" y="436" width="80" height="80" rx="14"/></clipPath>
+  </defs>
+  <rect width="1200" height="630" fill="#000000"/>
+
+  <!-- top bar: site identity -->
+  <rect width="1200" height="68" fill="#0a0f0a"/>
+  <rect y="68" width="1200" height="2" fill="#111c17"/>
+  <text x="36" y="46" fill="#b4aeae" font-size="34">&#x2261;</text>
+  <rect x="80" y="19" width="2" height="30" fill="#248f6c" opacity="0.6"/>
+  <text x="100" y="46" fill="#5fd7af" font-size="30" font-weight="bold">{{ .siteTitle | htmlEscape }}</text>
+
+  <!-- title -->
+  {{- range $i, $l := $tl }}
+  <text x="80" y="{{ add $titleTop (mul $i (add $tfs 12)) }}" fill="#ab82ff" font-weight="bold" font-size="{{ $tfs }}">{{ if eq $i 0 }}<tspan fill="#5fd7af">&#x25C9;</tspan> {{ end }}{{ $l | htmlEscape }}</text>
+  {{- end }}
+
+  <!-- tags -->
+  {{- with $tagstr }}
+  <text x="82" y="{{ $tagsY }}" fill="#5fd7af" font-size="19" opacity="0.85">{{ . | htmlEscape }}</text>
+  {{- end }}
+
+  <!-- excerpt -->
+  {{- range $i, $l := $el }}
+  <text x="80" y="{{ add $exTop (mul $i 40) }}" fill="#9aa0a6" font-size="24">{{ $l | htmlEscape }}</text>
+  {{- end }}
+
+  <!-- favicon corner logo -->
+  {{- with .favicon }}
+  <image href="data:{{ .MediaType.Type }};base64,{{ .Content | base64Encode }}" x="1074" y="436" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#favclip)" opacity="0.95"/>
+  {{- end }}
+
+  <!-- modeline: date / slug / meta -->
+  <rect y="562" width="1200" height="68" fill="#0a0f0a"/>
+  <rect y="562" width="1200" height="2" fill="#248f6c"/>
+  {{- $mx := 36 }}
+  {{- with .date }}
+  <text x="{{ $mx }}" y="606" fill="#888888" font-size="30">{{ . | htmlEscape }}</text>
+  {{- $mx = add $mx 200 }}
+  <text x="{{ $mx }}" y="606" fill="#3a3a3a" font-size="30">&#xB7;</text>
+  {{- $mx = add $mx 26 }}
+  {{- end }}
+  {{- with .slug }}
+  <text x="{{ $mx }}" y="606" fill="#5fd7af" font-size="30" font-weight="bold">*{{ . | htmlEscape }}*</text>
+  {{- end }}
+  {{- with .metaRight }}
+  <text x="1164" y="606" fill="#888888" font-size="30" text-anchor="end">{{ . | htmlEscape }}</text>
+  {{- end }}
+</svg>

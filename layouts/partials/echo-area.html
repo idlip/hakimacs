@@ -1,0 +1,15 @@
+{{- /* Command palette — native <dialog> element */ -}}
+<dialog id="palette-dialog" aria-label="Command palette">
+  <div class="palette-input-wrap">
+    <input
+      type="text"
+      id="palette-input"
+      class="palette-input"
+      placeholder="Search commands and posts…"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+  </div>
+  <div id="palette-results" role="listbox"></div>
+</dialog>

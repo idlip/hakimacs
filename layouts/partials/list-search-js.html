@@ -1,0 +1,85 @@
+<script>
+  (function () {
+    "use strict";
+    var inp = document.getElementById("post-search");
+    var count = document.getElementById("search-count");
+    if (!inp) return;
+
+    function run(raw) {
+      var q = raw.toLowerCase().trim();
+      var tag = q.charAt(0) === "#" ? q.slice(1) : null;
+      var n = 0;
+
+      document
+        .querySelectorAll("#article-list .article-item[data-title]")
+        .forEach(function (el) {
+          var ok;
+          if (!q) {
+            ok = true;
+          } else if (tag !== null) {
+            ok = tag.length > 0 && (el.dataset.tags || "").indexOf(tag) !== -1;
+          } else {
+            ok =
+              (el.dataset.title || "").indexOf(q) !== -1 ||
+              (el.dataset.tags || "").indexOf(q) !== -1;
+          }
+          el.style.display = ok ? "" : "none";
+          if (ok) n++;
+        });
+
+      document
+        .querySelectorAll("#article-list .year-divider[data-year-sep]")
+        .forEach(function (d) {
+          var sel =
+            '#article-list .article-item[data-year="' +
+            d.dataset.yearSep +
+            '"]:not([style*="none"])';
+          d.style.display = document.querySelector(sel) ? "" : "none";
+        });
+
+      count.textContent = q ? n + " match" + (n !== 1 ? "es" : "") : "";
+    }
+
+    inp.addEventListener("input", function () {
+      run(this.value);
+    });
+
+    // Tag cloud button toggle
+    document.querySelectorAll(".tag-cloud-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var tag = "#" + this.dataset.tag;
+        var active = this.classList.contains("active");
+        document.querySelectorAll(".tag-cloud-btn").forEach(function (b) {
+          b.classList.remove("active");
+        });
+        if (active) {
+          inp.value = "";
+          run("");
+        } else {
+          this.classList.add("active");
+          inp.value = tag;
+          run(tag);
+        }
+        inp.focus();
+      });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (
+        e.key === "/" &&
+        document.activeElement !== inp &&
+        document.activeElement.tagName !== "INPUT" &&
+        document.activeElement.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        inp.focus();
+        inp.select();
+      }
+      if (e.key === "Escape" && document.activeElement === inp) {
+        inp.value = "";
+        run("");
+        inp.blur();
+      }
+    });
+  })();
+</script>

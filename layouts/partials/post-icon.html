@@ -1,0 +1,18 @@
+{{- /*
+  post-icon: renders the type icon for a list row.
+  Reads params.tagIcons flat map — first matching tag wins, _default as fallback.
+  Usage: {{ partial "post-icon.html" .
+}}
+(pass the page as context) */ -}}
+{{- $icons := site.Params.tagicons -}}
+{{- $icon  := "" -}}
+{{- range .Params.tags -}}
+  {{- if not $icon -}}
+    {{- with index $icons (. | lower) -}}{{- $icon = . -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $icon -}}
+  {{- $icon = index $icons "_default" | default "" -}}
+{{- end -}}<span class="article-type-icon nf" aria-hidden="true"
+  >{{ $icon }}</span
+>

@@ -1,0 +1,45 @@
+{{- $email := "" -}}
+{{- range .Site.Params.socialLinks -}}
+  {{- if and (not $email) (hasPrefix .url "mailto:") -}}
+    {{- $email = strings.TrimPrefix "mailto:" .url -}}
+  {{- end -}}
+{{- end -}}
+{{- $uid := .File.UniqueID -}}
+
+
+<div class="post-comment">
+  <label class="comment-label" for="comment-{{ $uid }}">Leave a comment</label>
+  <textarea
+    id="comment-{{ $uid }}"
+    class="comment-textarea"
+    placeholder="Write your thoughts…"
+    rows="4"
+  ></textarea>
+  <div class="comment-actions">
+    <button
+      class="comment-submit"
+      type="button"
+      data-email="{{ $email }}"
+      data-subject="Re: {{ .Title }}"
+      data-uid="{{ $uid }}"
+    >
+      Comment
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var btn = document.querySelector('.comment-submit[data-uid="{{ $uid }}"]');
+  if (!btn) return;
+  btn.addEventListener('click', function () {
+    var body    = document.getElementById('comment-{{ $uid }}').value;
+    var subject = encodeURIComponent(btn.dataset.subject);
+    var bodyEnc = encodeURIComponent(body);
+    window.location.href =
+      'mailto:' + btn.dataset.email +
+      '?subject=' + subject +
+      (bodyEnc ? '&body=' + bodyEnc : '');
+  });
+})();
+</script>

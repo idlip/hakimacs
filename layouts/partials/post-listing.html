@@ -1,0 +1,139 @@
+{{- /*
+  post-listing partial — shared by list.html and the index.html fallback.
+  Handles home, section, and term page kinds.
+  */
+-}}
+{{- $allPages := .RegularPages.ByDate.Reverse -}}
+{{- if eq .Kind "home" -}}
+  {{- $allPages = (where .Site.RegularPages "Section" "posts").ByDate.Reverse -}}
+{{- end -}}
+{{- $grouped := $allPages.GroupByDate "2006" -}}
+
+
+<section
+  class="buffer buffer-list active"
+  id="buffer-list"
+  role="region"
+  aria-label="{{ .Title }} list"
+>
+  <div class="buffer-body">
+    <div class="list-content">
+      {{- with .Content }}
+        <div class="list-header">{{ . }}</div>
+      {{- end }}
+
+      {{- /* Term header — shown on /tags/foo/ pages */ -}}
+      {{- if eq .Kind "term" }}
+        <div class="term-header">
+          <span class="term-tag-name">#{{ .Title }}</span>
+          <span class="article-reading-time"
+            >&#x2014; {{ len .Pages }}
+            {{ if eq (len .Pages) 1 }}post{{ else }}posts{{ end }}</span
+          >
+          <a href="{{ "/tags/" | absLangURL }}" class="term-back"
+            >&#x2190; all tags</a
+          >
+        </div>
+      {{- end }}
+
+      {{- /* Tag cloud — shown on section and home pages */ -}}
+      {{- if or .IsSection (eq .Kind "home") }}
+        <div class="tag-cloud" id="tag-cloud">
+          {{- range .Site.Taxonomies.tags.ByCount }}
+            <button
+              class="tag-cloud-btn"
+              data-tag="{{ .Page.Title | lower }}"
+              type="button"
+            >
+              #{{ .Page.Title }}<span class="tag-cloud-count"
+                >{{ .Count }}</span
+              >
+            </button>
+          {{- end }}
+        </div>
+      {{- end }}
+
+
+      <div class="list-search" role="search">
+        <span class="list-search-prompt">Search:</span>
+        <input
+          type="text"
+          id="post-search"
+          class="list-search-input"
+          placeholder="search&#x2026; #emacs  (/ to focus, Esc to clear)"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+        <span id="search-count" class="list-search-count"></span>
+      </div>
+
+      <ul class="article-list" id="article-list" role="list">
+        {{- $idx := 0 -}}
+        {{- range $grouped }}
+          <li class="year-divider" data-year-sep="{{ .Key }}">
+            <span class="year-label">{{ .Key }}</span>
+          </li>
+          {{- range .Pages }}
+            <li
+              class="article-item"
+              data-index="{{ $idx }}"
+              data-year="{{ .Date.Format "2006" }}"
+              data-url="{{ .RelPermalink }}"
+              data-title="{{ .Title | lower }}"
+              data-tags="{{ range .Params.tags }}{{ . | lower }}{{ end }}"
+            >
+              <a href="{{ .RelPermalink }}" class="article-link">
+                <span class="article-meta">
+                  <span class="article-reading-time">
+                    <span class="nf nf-sm" aria-hidden="true"> </span
+                    >{{ .ReadingTime }}m
+                  </span>
+                  <time
+                    class="article-date"
+                    datetime="{{ .Date.Format "2006-01-02" }}"
+                  >
+                    <span class="nf nf-sm" aria-hidden="true"> </span>
+                    {{- /* Date option 1 – "02 Jan"  e.g. 04 Dec  */ -}}
+                    {{ .Date.Format "02 Jan" }}
+                    {{- /* Date option 2 – "01-02-2006"  e.g. 12-04-2023
+                      {{ .Date.Format "01-02-2006"
+                    }}
+                    */ -}}
+                  </time>
+                </span>
+                {{- partial "post-icon.html" . -}}
+                <span class="article-title">{{ .Title }}</span>
+              </a>
+              {{- with .Params.tags }}
+                <span class="post-tags">
+                  {{- range first 3 . -}}
+                    <a
+                      href="{{ (urlize (printf "tags/%s/" .)) | absLangURL }}"
+                      class="post-tag"
+                      >{{ . }}</a
+                    >
+                  {{- end -}}
+                </span>
+              {{- end }}
+            </li>
+            {{- $idx = add $idx 1 -}}
+          {{- end }}
+        {{- else }}
+          <li class="article-item no-articles">No articles found.</li>
+        {{- end }}
+      </ul>
+
+      <footer class="list-footer">{{ partial "footer" . }}</footer>
+    </div>
+    {{/* .list-content */}}
+  </div>
+
+  {{ partial "modeline.html" (dict
+    "buffer" (printf "*%s*" (.Title | default "posts" | lower))
+    "mode"   "Dired"
+    )
+  }}
+</section>
+
+{{ partial "list-search-js.html" . }}

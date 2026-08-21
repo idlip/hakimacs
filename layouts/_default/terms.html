@@ -1,0 +1,47 @@
+{{ define "main" }}
+  <section
+    class="buffer buffer-list active"
+    id="buffer-list"
+    role="region"
+    aria-label="{{ .Title }}"
+    tabindex="0"
+  >
+    <div class="buffer-body">
+      <div class="list-content">
+        <ul class="article-list" id="article-list" role="list">
+          {{- $idx := 0 -}}
+          {{- range .Pages.ByTitle -}}
+            <li
+              class="article-item"
+              data-index="{{ $idx }}"
+              data-url="{{ .RelPermalink }}"
+            >
+              <a href="{{ .RelPermalink }}" class="article-link">
+                <span class="post-tag">{{ .Title }}</span>
+                <span class="article-meta" style="margin-left:auto">
+                  <span class="article-reading-time"
+                    >{{ len .Pages }} posts</span
+                  >
+                </span>
+              </a>
+            </li>
+            {{- $idx = add $idx 1 -}}
+          {{- else }}
+            <li class="article-item no-articles">No tags found.</li>
+          {{- end }}
+        </ul>
+
+        <footer class="list-footer">{{ partial "footer" . }}</footer>
+      </div>
+      {{/* .list-content */}}
+    </div>
+
+    {{ partial "modeline.html" (dict
+      "buffer"  (printf "*%s*" (.Title | lower))
+      "mode"    "Dired"
+      "readonly" true
+      "keyhint" "<kbd>n</kbd>/<kbd>p</kbd> nav  <kbd>RET</kbd> open"
+      )
+    }}
+  </section>
+{{ end }}

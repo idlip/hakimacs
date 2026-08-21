@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="{{ .Site.Language.Lang }}" data-theme="dark" data-scheme="haki">
+  <head>
+    {{- partial "head.html" . -}}
+  </head>
+  <body>
+    <a class="skip-link" href="#buffer-container">Skip to content</a>
+    <div class="emacs-frame">
+      {{- partial "menu-bar.html" . -}}
+
+
+      <main class="buffer-container" id="buffer-container">
+        {{- block "main" . }}
+        {{- end }}
+      </main>
+
+      {{- partial "echo-area.html" . -}}
+      {{- partial "lightbox.html" . -}}
+    </div>
+
+    {{- /* Post data for command palette */ -}}
+    {{- $posts := slice -}}
+    {{- range $.Site.RegularPages -}}
+      {{- $posts = $posts | append (dict "title" .Title "url" .RelPermalink "date" (.Date.Format "2006-01-02") "tags" .Params.tags) -}}
+    {{- end -}}
+    {{- /* Tag data for palette: "#" mode + default search results */ -}}
+    {{- $tags := slice -}}
+    {{- range $name, $t := $.Site.Taxonomies.tags -}}
+      {{- $tags = $tags | append (dict "name" $name "count" $t.Count "url" (printf "/tags/%s/" ($name | urlize) | relLangURL)) -}}
+    {{- end -}}
+    {{- /* Navigation for palette (kept in sync with the menu). */ -}}
+    {{- $nav := slice -}}
+    {{- range $.Site.Menus.main -}}
+      {{- $nav = $nav | append (dict "name" .Name "url" (.URL | relLangURL)) -}}
+    {{- end -}}
+  <script>
+    window.__posts={{ $posts | jsonify | safeJS }};
+    window.__tags={{ $tags | jsonify | safeJS }};
+    window.__nav={{ $nav | jsonify | safeJS }};
+    window.__paletteIcons={{ $.Site.Params.paletteIcons | jsonify | safeJS }};
+  </script>
+  </body>
+</html>

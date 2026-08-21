@@ -1,0 +1,7 @@
+{{- /*
+  extract-href: given a raw string (plain URL or org-rendered <a href="...">) returns the URL.
+  Usage: {{ $url := partial "extract-href.html" $raw
+}}
+*/ -}}
+{{- $ext := . | replaceRE `(?s).*<a[^>]+href="?([^ ">]+)"?.*` "$1" -}}
+{{- return cond (ne $ext .) $ext . -}}

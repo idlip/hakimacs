@@ -1,0 +1,18 @@
+{{- /* Section/list OG image source (rasterized to /og/<section>.png by
+       `just og`). Same card as posts, via the shared og-card partial. Add
+       `#+description:` to the section's _index.org for a filled excerpt;
+       otherwise it falls back to the auto summary, else a title-only card. */ -}}
+{{- $ex := .Description -}}{{- if not $ex -}}{{- $ex = .Summary | plainify -}}{{- end -}}
+{{- $fav := "" -}}{{- with .Site.Params.favicon -}}{{- $fav = resources.Get (. | strings.TrimPrefix "/") -}}{{- end -}}
+{{- $count := len .Pages -}}
+{{- partial "og-card.svg" (dict
+  "title" .Title
+  "excerpt" $ex
+  "tags" .Params.tags
+  "slug" (path.Base .RelPermalink)
+  "date" ""
+  "metaRight" (cond (gt $count 0) (printf "%d entries" $count) "")
+  "siteTitle" .Site.Title
+  "ogfont" (.Site.Params.ogFont | default "monospace")
+  "favicon" $fav
+) -}}

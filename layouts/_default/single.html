@@ -1,0 +1,139 @@
+{{ define "main" }}
+  {{- /* Single Article Page - Full-screen content buffer */ -}}
+
+  {{- /* Article Content Buffer (active by default) */ -}}
+  <section
+    class="buffer buffer-content active"
+    id="buffer-content"
+    role="region"
+    aria-label="Article content"
+  >
+    <div class="buffer-body" id="content-body">
+      <article class="post-content" id="article-content">
+        {{- /* Breadcrumbs */ -}}
+        <nav class="breadcrumbs" aria-label="breadcrumb">
+          <a href="{{ "/" | relLangURL }}">~</a>
+          {{- range .Ancestors.Reverse }}
+            {{- if not .IsHome }}
+              <span class="breadcrumb-sep">/</span>
+              <a href="{{ .RelPermalink }}">{{ .Title | lower }}</a>
+            {{- end }}
+          {{- end }}
+          <span class="breadcrumb-sep">/</span>
+          <span class="breadcrumb-current">{{ .Title | truncate 40 }}</span>
+        </nav>
+
+        <div class="post-header">
+          <h1 class="post-title">{{ .Title }}</h1>
+          <div class="post-meta">
+            {{- if .Date -}}
+              <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}"
+                >{{ .Date.Format "2006-01-02" }}</time
+              >
+            {{- end -}}
+            {{- if and .Lastmod (ne (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02")) -}}
+              <span class="post-date-updated"
+                ><span class="nf" aria-hidden="true"> </span>
+                <time datetime="{{ .Lastmod.Format "2006-01-02" }}"
+                  >{{ .Lastmod.Format "2006-01-02" }}</time
+                ></span
+              >
+            {{- end -}}
+            <span class="post-reading-time"
+              >{{ .ReadingTime }} min read ({{ .WordCount }} words)</span
+            >
+            {{- with .Params.tags }}
+              <div class="post-tags">
+                {{- range . }}
+                  <a
+                    href="{{ (urlize (printf "tags/%s/" .)) | absLangURL }}"
+                    class="post-tag"
+                    >{{ . }}</a
+                  >
+                {{- end }}
+              </div>
+            {{- end }}
+          </div>
+        </div>
+
+        {{- /* Table of Contents */ -}}
+        {{- if (.Params.Toc | default .Site.Params.Toc) }}
+          <div class="table-of-contents">
+            <h2>
+              {{ (.Params.TocTitle | default .Site.Params.TocTitle) | default "Table of Contents" }}
+            </h2>
+            {{ .TableOfContents }}
+          </div>
+        {{- end }}
+
+
+        <div class="post-body">
+          {{- /* go-org sets alt/title to the raw image path when there's no explicit
+            :alt (#+attr_html: :alt "..."). If a #+caption exists, use it instead —
+            strictly better than a file path. Path-shaped values only, so a real
+            hand-written :alt (or a caption containing a literal ") is never
+            touched. No caption → left as-is (add :alt for those going forward). */
+          -}}
+          {{ .Content |
+            replaceRE `(<img[^>]*\balt=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)</figcaption>` `${1}${3}${2}<figcaption>${3}</figcaption>` |
+            replaceRE `(<img[^>]*\btitle=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)</figcaption>` `${1}${3}${2}<figcaption>${3}</figcaption>` |
+            replaceRE `<img ` `<img loading="lazy" decoding="async" ` |
+            safeHTML
+          }}
+        </div>
+
+        {{- /* references.html renders both the References list and the See Also
+          related posts (shared link budget), so no separate similar-posts. */
+        -}}
+        {{ partial "references.html" . }}
+
+        {{- if not .Params.no_comment }}{{ partial "comment.html" . }}{{ end -}}
+
+        {{- /* Post navigation */ -}}
+        <nav
+          class="post-navigation"
+          style="margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--border-dim);"
+        >
+          <div
+            style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1em;"
+          >
+            {{- with .PrevInSection }}
+              <a
+                id="post-prev"
+                href="{{ .RelPermalink }}"
+                style="color: var(--link);"
+              >
+                &larr;
+                {{ .Title | truncate 40 }}
+              </a>
+            {{- end }}
+            <span style="flex: 1;"></span>
+            {{- with .NextInSection }}
+              <a
+                id="post-next"
+                href="{{ .RelPermalink }}"
+                style="color: var(--link);"
+              >
+                {{ .Title | truncate 40 }} &rarr;
+              </a>
+            {{- end }}
+          </div>
+        </nav>
+      </article>
+      <footer>
+        {{ partial "footer" . }}
+      </footer>
+    </div>
+
+    {{ partial "modeline.html" (dict
+      "buffer"      (printf "%s.org" .File.BaseFileName)
+      "title"       .Title
+      "wordcount"   .WordCount
+      "readingtime" .ReadingTime
+      "date"        (cond (not .Date.IsZero) (.Date.Format "2006-01-02") (now.Format "2006-01-02"))
+      "widthtoggle" true
+      "progress"    (or (gt .ReadingTime 3) (gt .WordCount 500))
+      )
+    }}
+  </section>
+{{ end }}

@@ -1,0 +1,15 @@
+{{- /*
+  resolve-icon: per-item icon override, shared by every branch of topic-list.html.
+  Input:  dict "item" (parse-dl result) "iconsMap" (site.Params.<icons_param>) "fallback" (nf glyph)
+  Return: nf glyph string
+  */
+-}}
+{{- $result := .fallback -}}
+{{- range .item.parts -}}
+  {{- $p := strings.TrimSpace . -}}
+  {{- if strings.HasPrefix $p "tag:" -}}
+    {{- $key := replaceRE `(?s)^tag:(.*)$` "$1" $p | strings.TrimSpace | lower -}}
+    {{- $result = index $.iconsMap $key | default $result -}}
+  {{- end -}}
+{{- end -}}
+{{- return $result -}}

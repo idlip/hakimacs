@@ -1,0 +1,130 @@
+{{- /*
+  References + See Also, merged into one partial.
+
+  Collects in-content links (external http(s) and internal /page links, deduped,
+  footnote/TOC anchors and mailto: excluded) as a numbered References list.
+
+  A shared link budget (Site.Params.linkBudget, default 7) keeps the trailing
+  link block from crowding: See Also related posts only fill UP TO the budget
+  when references are few, and are hidden entirely once references >= budget.
+  Related posts already cited in-content are excluded (no duplicates).
+
+  Usage: {{ partial "references.html" .
+}}
+*/ -}}
+{{- $budget := .Site.Params.linkBudget | default 7 -}}
+
+{{- /* 1. Collect references from post content. */ -}}
+{{- $matches := findRESubmatch `(?s)<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>` .Content -}}
+{{- $seen := slice -}}
+{{- $refs := slice -}}
+{{- $refURLs := slice -}}
+{{- range $matches -}}
+  {{- $href := index . 1 -}}
+  {{- $text := index . 2 | plainify | htmlUnescape | strings.TrimSpace -}}
+  {{- $isExt := or (hasPrefix $href "http://") (hasPrefix $href "https://") -}}
+  {{- $isInt := hasPrefix $href "/" -}}
+  {{- if and (or $isExt $isInt) (not (in $seen $href)) -}}
+    {{- $seen = $seen | append $href -}}
+    {{- $refs = $refs | append (dict "href" $href "text" $text "internal" $isInt) -}}
+    {{- if $isInt -}}
+      {{- $refURLs = $refURLs | append (strings.TrimSuffix "/" $href) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $n := len $refs -}}
+
+{{- /* 2. Build See Also fill only while under budget. */ -}}
+{{- $related := slice -}}
+{{- if lt $n $budget -}}
+  {{- $tags := .Params.tags -}}
+  {{- $tag1 := index $tags 0 -}}
+  {{- $tag2 := index $tags 1 -}}
+  {{- $frefs := .Params.refs -}}
+  {{- $ref1 := index $frefs 0 -}}
+  {{- $ref2 := index $frefs 1 -}}
+  {{- if or $tag1 $tag2 $ref1 $ref2 -}}
+    {{- $current := . -}}
+    {{- range .Site.RegularPages -}}
+      {{- $tagMatch := or (and $tag1 (in .Params.tags $tag1)) (and $tag2 (in .Params.tags $tag2)) -}}
+      {{- $refMatch := or (and $ref1 (in .Params.refs $ref1)) (and $ref2 (in .Params.refs $ref2)) -}}
+      {{- $alreadyRef := in $refURLs (strings.TrimSuffix "/" .RelPermalink) -}}
+      {{- if and (ne . $current) (or $tagMatch $refMatch) (not $alreadyRef) -}}
+        {{- $related = $related | append . -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $related = first (sub $budget $n) $related -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* 3. Render. References first, then See Also. */ -}}
+{{- with $refs -}}
+  <section class="references" aria-labelledby="references-heading">
+    <h2 id="references-heading" class="references-title">References</h2>
+    <ol class="references-list">
+      {{- range . }}
+        {{- if .internal }}
+          {{- $pg := site.GetPage .href -}}
+          <li>
+            <a href="{{ .href }}"
+              >{{ with .text }}
+                {{ . }}
+              {{ else }}
+                {{ with $pg }}{{ .Title }}{{ else }}{{ $.Site.Title }}{{ end }}
+              {{ end }}</a
+            >
+          </li>
+        {{- else }}
+          {{- $domain := .href | replaceRE `^https?://(www\.)?` "" | replaceRE `/.*$` "" -}}
+          <li>
+            <a href="{{ .href }}" target="_blank" rel="noopener noreferrer"
+              >{{ with .text }}{{ . }}{{ else }}{{ .href }}{{ end }}</a
+            >
+            {{- if and .text (ne .text .href) }}
+              <span class="references-url">{{ $domain }}</span>
+            {{ end }}
+          </li>
+        {{- end }}
+      {{- end }}
+    </ol>
+  </section>
+{{- end -}}
+
+{{- with $related -}}
+  <ul class="article-list similar-posts" role="list" aria-label="Related posts">
+    <li class="year-divider">
+      <span class="year-label">&#9655; See Also</span>
+    </li>
+    {{- range . }}
+      <li
+        class="article-item"
+        data-url="{{ .RelPermalink }}"
+        data-title="{{ .Title | lower }}"
+      >
+        <a href="{{ .RelPermalink }}" class="article-link">
+          <span class="article-meta">
+            <time
+              class="article-date"
+              datetime="{{ .Date.Format "2006-01-02" }}"
+            >
+              <span class="nf nf-sm" aria-hidden="true"> </span
+              >{{ .Date.Format "02 Jan 2006" }}
+            </time>
+          </span>
+          <span class="article-title">{{ .Title }}</span>
+        </a>
+        {{- with .Params.tags }}
+          <span class="post-tags">
+            {{- range first 2 . -}}
+              <a
+                href="{{ (urlize (printf "tags/%s/" .)) | absLangURL }}"
+                class="post-tag"
+                >{{ . }}</a
+              >
+            {{- end -}}
+          </span>
+        {{- end }}
+      </li>
+    {{- end }}
+  </ul>
+{{- end -}}

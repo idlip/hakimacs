@@ -1,0 +1,34 @@
+{{- /*
+  scheme-css — generate the preset [data-scheme] CSS blocks from base16 yaml,
+  so colors stay authentic (single source = data/schemes/base16/*.yaml).
+  For each params.colorSchemes entry: emit a dark block from its `dark` yaml key
+  and a light block from `light` (if set). Entries without `dark` (haki, Modus)
+  are hand-written in schemes.css / theme.css (@layer tokens). Returns the CSS string.
+  */
+-}}
+{{- $keys := slice "base00" "base01" "base02" "base03" "base04" "base05" "base06" "base07" "base08" "base09" "base0A" "base0B" "base0C" "base0D" "base0E" "base0F" -}}
+{{- $css := "" -}}
+{{- range .Site.Params.colorSchemes -}}
+  {{- $name := .name -}}
+  {{- $variants := slice
+    (dict "key" .dark  "sel" (printf "[data-scheme=%q]" $name))
+    (dict "key" .light "sel" (printf "[data-scheme=%q][data-theme=\"light\"]" $name))
+  -}}
+  {{- range $variants -}}
+    {{- $sel := .sel -}}
+    {{- with .key -}}
+      {{- with (index site.Data.schemes.base16 .) -}}
+        {{- $p := .palette -}}
+        {{- $vars := "" -}}
+        {{- range $k := $keys -}}
+          {{- $v := or (index $p $k) (index $p (lower $k)) -}}
+          {{- with $v -}}
+            {{- $vars = printf "%s--%s:%s;" $vars $k . -}}
+          {{- end -}}
+        {{- end -}}
+        {{- $css = printf "%s%s{%s}\n" $css $sel $vars -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $css -}}

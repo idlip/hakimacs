@@ -1,0 +1,102 @@
+{{ define "main" }}
+  {{- $all := partial "all-schemes.html" . -}}
+  {{- $all = sort $all "name" -}}
+
+
+  <section
+    class="buffer buffer-content active"
+    id="buffer-content"
+    role="region"
+    aria-label="{{ .Title }}"
+  >
+    <div class="buffer-body" id="content-body">
+      <article class="post-content" id="article-content">
+        <div class="post-header">
+          <h1 class="post-title">{{ .Title }}</h1>
+        </div>
+
+        <div class="post-body">{{ .Content }}</div>
+
+        <div class="list-search" role="search">
+          <span class="list-search-prompt">Search:</span>
+          <input
+            type="text"
+            id="topic-search"
+            class="list-search-input"
+            placeholder="filter by name or author&#x2026; (/ to focus, Esc to clear)"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+          />
+          <span id="topic-count" class="list-search-count"
+            >{{ len $all }} schemes</span
+          >
+          <button
+            id="view-toggle"
+            class="tag-cloud-btn"
+            type="button"
+            aria-label="Toggle list / grid view"
+            aria-pressed="false"
+            title="Toggle list / grid view"
+          >
+            <span class="nf" aria-hidden="true">󰕰 </span>
+          </button>
+        </div>
+
+        <ul class="article-list" id="article-list" role="list">
+          {{- range $all }}
+            {{- $searchText := printf "%s %s" .name .authorName | lower -}}
+            <li
+              class="article-item topic-item scheme-card"
+              data-title="{{ $searchText }}"
+            >
+              <button
+                type="button"
+                class="scheme-card-btn"
+                data-key="{{ .key }}"
+                data-name="{{ .name }}"
+                data-colors="{{ .colors | jsonify }}"
+              >
+                <span class="scheme-card-head">
+                  <span class="scheme-card-name">{{ .name }}</span>
+                  {{- with .variant }}
+                    <span class="scheme-card-variant">{{ . }}</span>
+                  {{ end }}
+                </span>
+                <span class="scheme-card-swatches" aria-hidden="true">
+                  {{- range .colors }}
+                    <span class="swatch" style="background:{{ . }}"></span>
+                  {{ end }}
+                </span>
+              </button>
+              {{- if .authorUrl }}
+                <a
+                  href="{{ .authorUrl }}"
+                  class="scheme-card-author"
+                  target="_blank"
+                  rel="noopener"
+                  >{{ .authorName }}</a
+                >
+              {{- else }}
+                <span class="scheme-card-author">{{ .authorName }}</span>
+              {{- end }}
+            </li>
+          {{- end }}
+        </ul>
+
+        {{ partial "topic-list-js.html" . }}
+
+      </article>
+
+      <footer>{{ partial "footer" . }}</footer>
+    </div>
+
+    {{ partial "modeline.html" (dict
+      "buffer"      "*themes*"
+      "title"       .Title
+      "date"        (now.Format "2006-01-02")
+      "widthtoggle" true
+      )
+    }}
+  </section>
+{{ end }}

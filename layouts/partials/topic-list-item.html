@@ -1,0 +1,114 @@
+{{- /*
+  topic-list-item: unified listing item.
+  Input: dict "e" (parse-dl result) "icon" (nf glyph) "chipColor" (base16 var name e.g. "base0E")
+  */
+-}}
+{{- $chipColor := .chipColor -}}
+
+{{- /* Full-line search haystack: name + desc + every "key: value" part, plain-text, lowercase.
+  Powers #topic-search in topic-list-js.html (plain substring match, no JS change needed). */
+-}}
+{{- $searchText := printf "%s %s %s" .e.name .e.desc (delimit .e.parts " ") | plainify | lower -}}
+
+{{- /* Pre-scan parts for ref: key to build backlinks before rendering header */ -}}
+{{- $refPages := slice -}}
+{{- range .e.parts -}}
+  {{- $p := strings.TrimSpace . -}}
+  {{- if strings.HasPrefix $p "refs:" -}}
+    {{- $slug := replaceRE `(?s)^refs:(.*)$` "$1" $p | strings.TrimSpace | urlize -}}
+    {{- with index site.Taxonomies.refs $slug -}}
+      {{- $refPages = . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+
+<li
+  class="article-item topic-item"
+  data-url="{{ .e.url }}"
+  data-title="{{ $searchText }}"
+  data-external="true"
+  {{- if $chipColor }}style="--chip-color: var(--{{ $chipColor }})"{{- end }}
+>
+  <div class="project-left">
+    <span class="project-icon nf" aria-hidden="true">{{ .icon }}</span>
+  </div>
+  <div class="article-link">
+    <div class="project-header">
+      <a
+        href="{{ .e.url }}"
+        class="article-title project-name"
+        target="_blank"
+        rel="noopener"
+        >{{ .e.name }}</a
+      >
+      {{- with $refPages }}
+        <span class="project-refs" aria-label="related posts">
+          {{- range $i, $wp := . -}}
+            <a
+              href="{{ $wp.RelPermalink }}"
+              class="project-ref-link"
+              title="{{ $wp.Title }}"
+              >[{{ add $i 1 }}]</a
+            >
+          {{- end -}}
+        </span>
+      {{- end }}
+    </div>
+    {{- with .e.desc }}
+      <span class="wander-desc">{{ . | safeHTML }}</span>
+    {{- end }}
+    {{- with .e.parts }}
+      <span class="project-tags" aria-label="metadata">
+        {{- range . -}}
+          {{- $p      := strings.TrimSpace . -}}
+          {{- if strings.Contains $p ":" -}}
+            {{- $key    := replaceRE `(?s)^([^:]+):.*$` "$1" $p | strings.TrimSpace -}}
+            {{- $rawval := replaceRE `(?s)^[^:]+:(.*)$`  "$1" $p | strings.TrimSpace -}}
+            {{- $url    := partial "extract-href.html" $rawval -}}
+            {{- if eq $key "tag" -}}
+              {{- if index site.Taxonomies.tags ($rawval | urlize) -}}
+                <a
+                  href="{{ "/tags/" | relURL }}{{ $rawval | urlize }}/"
+                  class="project-tag"
+                  title="check posts tagged as {{ $rawval }}"
+                  aria-label="check posts tagged as {{ $rawval }}"
+                  >{{ $rawval }}</a
+                >
+              {{- else -}}
+                <span class="project-tag" title="site tagged with {{ $rawval }}"
+                  >{{ $rawval }}</span
+                >
+              {{- end -}}
+            {{- else if eq $key "refs" -}}
+              {{- if index site.Taxonomies.refs ($rawval | urlize) -}}
+                <a
+                  href="{{ "/refs/" | relURL }}{{ $rawval | urlize }}/"
+                  class="project-tag"
+                  title="check posts referencing {{ $rawval }}"
+                  aria-label="check posts referencing {{ $rawval }}"
+                  >{{ $rawval }}</a
+                >
+              {{- else -}}
+                <span class="project-tag" title="site references {{ $rawval }}"
+                  >{{ $rawval }}</span
+                >
+              {{- end -}}
+            {{- else if strings.HasPrefix $url "http" -}}
+              <a
+                href="{{ $url | safeURL }}"
+                class="project-tag"
+                target="_blank"
+                rel="noopener"
+                aria-label="{{ $key }}"
+                >{{ $key }} ↗</a
+              >
+            {{- else if $rawval -}}
+              <span class="project-tag">{{ $key }}: {{ $rawval }}</span>
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      </span>
+    {{- end }}
+  </div>
+</li>
