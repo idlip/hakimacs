@@ -1,0 +1,14 @@
+# Theme metadata
+name = "Hakimacs"
+license = "MIT"
+licenselink = "https://github.com/idlip/hakimacs/blob/main/LICENSE-MIT"
+description = "An Emacs-inspired Hugo theme with keyboard navigation, a command palette, and a full base16 color scheme system"
+homepage = "https://github.com/idlip/hakimacs"
+demosite = "https://idlip.in"
+tags = ["emacs", "cli", "keyboard", "dark", "light", "blog", "monospace"]
+features = ["keyboard navigation", "command palette", "modeline", "base16 schemes"]
+min_version = "0.90.0"
+
+[author]
+  name = "Dilip"
+  homepage = "https://idlip.in"
