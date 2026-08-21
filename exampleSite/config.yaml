@@ -1,0 +1,107 @@
+baseURL: "https://example.org/"
+locale: en-us
+title: "Emacs Theme Demo"
+theme: emacs
+enableEmoji: true
+enableInlineShortcodes: true
+copyright: "Demo content -- do as you wish."
+
+pagination:
+  pagerSize: 7
+
+# Two taxonomies: tags (primary) and refs (topical cross-link for "See Also").
+taxonomies:
+  tag: tags
+  ref: refs
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true # raw HTML, shortcodes
+  highlight:
+    noClasses: false # theme styles chroma classes itself
+
+params:
+  description: "A demo blog built with the Emacs Hugo theme."
+  authorName: "Demo Author"
+  authorEmail: "demo@example.org"
+
+  # Presets in the menu picker. `name` must match a data-scheme in schemes.css.
+  # Empty name = the built-in Modus default.
+  colorSchemes:
+    - {
+        name: haki,
+        label: "Haki",
+        bg: "#000000",
+        fg: "#ffffff",
+        accent: "#5fd7af",
+      }
+    - {
+        name: "",
+        label: "Modus",
+        bg: "#000000",
+        fg: "#ffffff",
+        accent: "#2fafff",
+      }
+    - {
+        name: dracula,
+        label: "Dracula",
+        bg: "#282a36",
+        fg: "#f8f8f2",
+        accent: "#bd93f9",
+      }
+    - {
+        name: gruvbox,
+        label: "Gruvbox",
+        bg: "#282828",
+        fg: "#ebdbb2",
+        accent: "#b8bb26",
+      }
+    - {
+        name: nord,
+        label: "Nord",
+        bg: "#2e3440",
+        fg: "#eceff4",
+        accent: "#88c0d0",
+      }
+    - {
+        name: tokyo-night,
+        label: "Tokyo Night",
+        bg: "#1a1b26",
+        fg: "#c0caf5",
+        accent: "#7aa2f7",
+      }
+    - {
+        name: catppuccin-mocha,
+        label: "Catppuccin Mocha",
+        bg: "#1e1e2e",
+        fg: "#cdd6f4",
+        accent: "#cba6f7",
+      }
+    - {
+        name: rose-pine,
+        label: "Rosé Pine",
+        bg: "#191724",
+        fg: "#e0def4",
+        accent: "#c4a7e7",
+      }
+
+  # Nerd Font glyphs shown before titles in listings. Needs a Nerd Font installed.
+  tagIcons:
+    emacs: " "
+    orgmode: " "
+    meta: " "
+    demo: " "
+    css: " "
+    _default: " "
+
+  socialLinks:
+    - { label: "demo@example.org", url: "mailto:demo@example.org", icon: " " }
+    - { label: "hakimacs", url: "https://github.com/idlip/hakimacs", icon: " " }
+
+menu:
+  main:
+    - { name: Home, weight: 1, url: / }
+    - { name: Posts, weight: 2, url: /posts/ }
+    - { name: About, weight: 3, url: /about/ }
+    - { name: " Feed", weight: 4, url: index.xml }

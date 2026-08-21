@@ -8,6 +8,7 @@ includes = [
   "assets/**/*.js",
   "exampleSite/**/*.css",
   "exampleSite/**/*.js",
+  "exampleSite/**/*.yaml",
 ]
 
 [formatter.prettier-templates]
@@ -18,4 +19,4 @@ includes = ["layouts/**/*.html", "layouts/**/*.js"]
 [formatter.toml]
 command = "taplo"
 options = ["format"]
-includes = ["*.toml", "exampleSite/*.toml"]
+includes = ["*.toml"]

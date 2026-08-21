@@ -1,0 +1,17 @@
+#+title: About
+#+date: 2024-01-01
+#+no_comment: true
+
+This is the demo site for *Hakimacs*, an Emacs Hugo theme. It exists so you can
+see the theme in motion before installing it.
+
+Grab the theme:
+
+#+begin_src sh
+cd your-hugo-site
+git submodule add https://github.com/idlip/hakimacs themes/emacs
+#+end_src
+
+Full documentation lives in the theme's =README.org=. The =#+no_comment: true= line
+in this page's front matter hides the comment box --- handy for pages that are not
+posts.

@@ -1,0 +1,62 @@
+#+title: Feature Showcase: Callouts, Code, and References
+#+date: 2024-02-02
+#+lastmod: 2024-02-04
+#+tags[]: emacs demo
+#+refs[]: theme
+#+draft: false
+#+options: toc:t
+
+This post exercises most of the theme's content features at once. Because it is
+long enough, you should also see the *reading-progress bar* fill along the top as
+you scroll, and a *table of contents* just below the title.
+
+* Callouts
+
+Three callout shortcodes ship with the theme:
+
+{{< note >}}
+This is a *note*. Use it for asides and clarifications.
+{{< /note >}}
+
+{{< tip >}}
+This is a *tip*. Use it for best practices.
+{{< /tip >}}
+
+{{< warn >}}
+This is a *warning*. Use it when something might break.
+{{< /warn >}}
+
+* Sidenotes
+
+The theme supports margin sidenotes.{{< sidenote >}}Like this one. On wide
+screens it floats to the right; on narrow screens it drops inline.{{< /sidenote >}}
+They are great for tangents that would otherwise interrupt the main text.
+
+* Code blocks
+
+Standard source blocks get syntax highlighting and a language label:
+
+#+begin_src python
+def greet(name):
+    return f"hello, {name}"
+#+end_src
+
+Custom language names work too --- highlighting is simply skipped, but the label
+still shows. Handy for an optional summary:
+
+#+begin_src tldr
+The Emacs Hugo theme turns a Hugo blog into an Emacs-like reading experience.
+#+end_src
+
+* Links become references
+
+Every external link in this post is collected, de-duplicated, and numbered into a
+*References* section just above the comment box. Write links normally and let the
+theme build the citation list: see [[https://gohugo.io][Hugo]], the
+[[https://orgmode.org][Org mode]] manual, and the
+[[https://github.com/tinted-theming/schemes][base16 schemes]] collection.
+
+* Similar posts
+
+Because this post shares the =emacs= tag (and the =theme= ref) with others, a
+"See Also" block appears below, followed by previous/next navigation.

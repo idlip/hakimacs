@@ -1,0 +1,47 @@
+#+title: Writing Posts in Org
+#+date: 2024-02-10
+#+tags[]: emacs orgmode
+#+refs[]: theme
+#+draft: false
+
+Posts are plain Org files in =content/posts/=. Markdown works too, but Org is the
+first-class citizen here.
+
+* Front matter
+
+Org keyword front matter uses =[]= on list-valued keys:
+
+#+begin_src org
+#+title: My Post Title
+#+date: 2024-02-10
+#+tags[]: emacs orgmode
+#+refs[]: theme
+#+draft: false
+#+options: toc:t
+#+end_src
+
+| Key           | Effect                                                       |
+|---------------+--------------------------------------------------------------|
+| =#+title:=      | Post title (required)                                        |
+| =#+date:=       | Publish date, shown in the modeline and list                 |
+| =#+lastmod:=    | If different from date, shows an "updated" badge             |
+| =#+tags[]:=     | First two drive "See Also"; the first gets a tag icon        |
+| =#+refs[]:=     | Extra topical axis for "See Also"                            |
+| =#+draft:=      | =true= hides from the build (use =hugo serve -D= to preview)     |
+| =toc:t=         | Renders a table of contents                                  |
+
+* Automatic on every post
+
+You do not markup any of these; the theme adds them:
+
+- breadcrumbs at the top
+- reading-progress bar (longer posts)
+- "See Also" from shared tags or refs
+- previous / next navigation
+- a numbered *References* list from your external links
+
+* Comments
+
+The comment box is backend-free: it opens a pre-filled =mailto:= to the address in
+=params.socialLinks=. Swap the =comment.html= partial for Giscus or Disqus if you
+want threaded comments.

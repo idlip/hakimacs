@@ -1,0 +1,29 @@
+#+title: Welcome to the Emacs Hugo Theme
+#+date: 2024-01-15
+#+tags[]: emacs meta
+#+refs[]: theme
+#+draft: false
+
+This demo blog runs the *Emacs Hugo theme*: your site rendered as a fake Emacs
+frame, complete with a modeline, an echo area, a command palette, and Vim/Emacs
+keybindings. Everything you see is static HTML, CSS, and a single deferred JS
+bundle. No backend.
+
+Press =?= to see every keybinding, or =x= to open the command palette.
+
+* Try these first
+
+- =x= --- open the command palette (search posts, run commands, browse schemes)
+- =t= / =i= --- toggle dark / light
+- =f= --- cycle font: mono, sans, serif, mixed
+- =w= --- cycle content width
+- =c= --- open the color scheme picker
+
+The palette also browses all 305 [[https://github.com/tinted-theming/schemes][tinted-theming]] base16
+schemes: open it, then type =t= followed by a space.
+
+* Where to go next
+
+Read [[/posts/feature-showcase/][the feature showcase]] to see callouts, sidenotes, code
+blocks, and the auto references list in one place. Or skim
+[[/posts/writing-in-org/][writing in org]] for the front matter cheatsheet.
