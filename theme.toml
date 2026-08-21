@@ -6,9 +6,14 @@ description = "An Emacs-inspired Hugo theme with keyboard navigation, a command 
 homepage = "https://github.com/idlip/hakimacs"
 demosite = "https://idlip.in"
 tags = ["emacs", "cli", "keyboard", "dark", "light", "blog", "monospace"]
-features = ["keyboard navigation", "command palette", "modeline", "base16 schemes"]
+features = [
+  "keyboard navigation",
+  "command palette",
+  "modeline",
+  "base16 schemes",
+]
 min_version = "0.90.0"
 
 [author]
-  name = "Dilip"
-  homepage = "https://idlip.in"
+name = "Dilip"
+homepage = "https://idlip.in"

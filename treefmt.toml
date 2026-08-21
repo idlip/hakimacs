@@ -1,0 +1,21 @@
+# treefmt.toml :: run `just fmt` (or `treefmt`) to format everything below.
+
+[formatter.prettier-web]
+command = "prettier"
+options = ["--write"]
+includes = [
+  "assets/**/*.css",
+  "assets/**/*.js",
+  "exampleSite/**/*.css",
+  "exampleSite/**/*.js",
+]
+
+[formatter.prettier-templates]
+command = "prettier-gotmpl"
+options = ["--write"]
+includes = ["layouts/**/*.html", "layouts/**/*.js"]
+
+[formatter.toml]
+command = "taplo"
+options = ["format"]
+includes = ["*.toml", "exampleSite/*.toml"]
