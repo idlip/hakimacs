@@ -80,6 +80,9 @@ like learning by example.
 | *Callouts / sidenotes* | Note / Tip / Warning boxes + margin sidenotes via shortcodes                           |
 | *Comments*             | Zero-backend: a textarea that opens a pre-filled =mailto:=                               |
 | *Wander*               | Small-web browser from an org file                                                     |
+| *Themes gallery*       | =/themes/= live-preview grid of every base16 scheme, hover to preview, click to pin      |
+| *Sitemap*              | =/sitemap/= auto-generated site tree, always reflects the live page tree                 |
+| *Grid / list toggle*   | Any =topic-list= page can switch to a card grid, persisted in =localStorage=               |
 | *Mobile*               | Single-buffer layout on small screens                                                  |
 
 --------------
@@ -218,6 +221,7 @@ screens, inline on narrow ones.{{< /sidenote >}} Text continues.
 | =warn=         | Yellow "Warning" callout                          |
 | =sidenote=     | Right-margin aside (collapses inline below 900px) |
 | =social-links= | Renders =params.socialLinks= as an icon list        |
+| =latest=       | Links the newest post in =/posts/= (title + date)   |
 
 *** Code blocks
 :PROPERTIES:
@@ -330,7 +334,7 @@ Three layers, all base16:
 1. *Raw palette* --- =--base00..--base0F=, *hex only* (JS sets these
    live, so they cannot be oklch).
 2. *Semantic aliases* --- =--fg-main=, =--bg-dim=, =--blue=, etc.,
-   mapped from the base slots in =themes.css=.
+   mapped from the base slots in =theme.css= (=@layer tokens=).
 3. *Transformed variants* --- =-faint= / =-warmer= / =-cooler= via
    =color-mix()= / relative-color oklch.
 
@@ -359,18 +363,27 @@ python3 parse-scheme.py data/schemes/dracula.yaml --dark
 :PROPERTIES:
 :CUSTOM_ID: special-sections
 :END:
-| Section              | URL                      | Source                    | Notes                                                                                                                            |
-|----------------------+--------------------------+---------------------------+----------------------------------------------------------------------------------------------------------------------------------|
-| *Posts*                | =/posts/=                  | =content/posts/*.org=       | Main blog.                                                                                                                       |
-| *Wander*               | =/wander/=                 | =content/wander/_index.org= | Small-web browser. Sites are an org description list; =#+wanderconsoles:= lists console IDs. Edit only that one file to add sites. |
-| *Projects*             | =/repo/=                   | org H2 sections           | Each H2 becomes a year/group header with a count badge; items are =dt/dd= pairs supporting =tags:=, =web:=, =docs:=. Open in new tab.    |
-| *Media / Quotes / Now* | =/media/=, =/quotes/=, =/now/= | org files                 | Standard listing pages.                                                                                                          |
+| Section      | URL example     | Activated by             | Notes                                                                                                                                      |
+|--------------+-----------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------|
+| *Posts*        | =/posts/=         | Hugo's default =list.html= | Main blog.                                                                                                                                 |
+| *Wander*       | =/wander/=        | =#+layout: topic-list=     | Small-web browser. Sites are an org description list; =#+wanderconsoles:= lists console IDs.                                                 |
+| *Projects*     | =/projects/=      | =#+layout: topic-list=     | Org H2 sections become year/group headers with a count badge; items are =dt/dd= pairs supporting =tags:=, =refs:=, or any =key: value= metadata.   |
+| *Media*        | =/media/=         | =#+layout: topic-list=     | Same listing, different content --- H2-grouped =dt/dd= entries.                                                                              |
+| *Color Themes* | =/themes/=        | =#+layout: themes=         | Live-preview gallery of every base16 scheme (=partial "all-schemes.html"=); hover to preview, click to apply + pin.                          |
+| *Sitemap*      | =/sitemap/=       | =#+layout: sitemap=        | Auto-generated site tree --- walks =site.Sections= + top-level pages at build time, so it can't drift out of sync with a hand-written index. |
+| *Quotes / Now* | =/quotes/=, =/now/= | org files                | Standard listing pages, no special layout.                                                                                                 |
 
-Both Wander and Projects parse =dt/dd= via the shared =parse-dl.html= +
-=extract-href.html= partials, so new metadata fields are a
-=strings.HasPrefix= away.
+=topic-list= is one generic layout for any "listing of things" page (Wander,
+Projects, Media, and whatever else you invent) --- it's selected by front
+matter, not by directory name, so a single top-level =content/foo.org= works
+exactly as well as =content/foo/_index.org=. It parses =dt/dd= pairs via the
+shared =parse-dl.html= + =extract-href.html= partials, so new metadata fields
+are a =strings.HasPrefix= away. =themes= and =sitemap= are the two layouts that
+*aren't* front-matter-driven listings --- they read from =site.Data=/=site.Sections=
+directly instead of parsing =.Content=.
 
-You can go on write your own Listing page using same template and carry on.
+You can go on write your own Listing page using the =topic-list= template and
+carry on.
 
 --------------
 
@@ -392,9 +405,15 @@ slot. It holds =@font-face= rules and =:root= overrides:
 *CSS pipeline order* (concatenated + fingerprinted in =head.html=):
 
 #+begin_example
-themes.css → main.css → menu-bar.css → windows.css → modeline.css →
-echo-area.css → syntax.css → mobile.css → custom.css → schemes.css
+theme.css → custom.css → schemes.css → schemes-gen
 #+end_example
+
+=theme.css= is one file using native =@layer tokens, base, components, chrome,
+overrides= --- the old per-concern split (=main.css=, =menu-bar.css=,
+=modeline.css=, etc.) was merged into it; if you see any of those filenames
+referenced anywhere, it's stale. =custom.css= (site root, unlayered) and
+=schemes.css= (preset named schemes, unlayered) stay separate so they keep
+overriding the layered defaults.
 
 *Site-level layout overrides* go in your site's =layouts/= (takes
 precedence over the theme) so you never edit the submodule.
@@ -413,43 +432,44 @@ the partial if you want Giscus/Disqus.
 themes/emacs/
 ├── assets/
 │   ├── css/
-│   │   ├── themes.css       # semantic color vars + font/width modes
-│   │   ├── main.css         # reset, typography, callouts, sidenotes, comments
-│   │   ├── menu-bar.css     # menu bar + dropdowns
-│   │   ├── windows.css      # buffer frame, article list, references
-│   │   ├── modeline.css     # modeline
-│   │   ├── echo-area.css    # command palette + help overlay
-│   │   ├── syntax.css       # chroma code highlighting
-│   │   ├── mobile.css       # responsive breakpoints
-│   │   └── schemes.css      # preset base16 scheme variables
+│   │   ├── theme.css        # everything: @layer tokens, base, components, chrome, overrides
+│   │   └── custom.css       # site-root override slot (@font-face + font vars)
 │   └── js/                  # bundled → app.js (deferred)
-│       ├── keyboard.js      # vim/emacs keys
-│       ├── windows.js       # buffer switch, width/font, random scheme
-│       ├── menu.js          # theme toggle, scheme popup
-│       └── palette.js       # command palette (x)
+│       ├── keyboard.js      # vim/emacs keys, scroll utils, code-copy, lightbox
+│       ├── menu.js          # theme toggle, scheme popup, font/width/align cycling
+│       ├── palette.js       # command palette (x)
+│       └── themes-gallery.js # /themes/ grid: hover preview, click to apply + pin
 ├── layouts/
 │   ├── _default/
-│   │   ├── baseof.html      # shell: data-theme/data-scheme, menu, echo area
+│   │   ├── baseof.html      # shell: data-theme/data-scheme, menu, echo area, dialogs
 │   │   ├── list.html        # article list buffer
 │   │   ├── single.html      # post buffer (progress, toc, references, nav)
+│   │   ├── topic-list.html  # generic listing layout (#+layout: topic-list)
+│   │   ├── themes.html      # color scheme gallery (#+layout: themes)
+│   │   ├── sitemap.html     # auto-generated site tree (#+layout: sitemap)
 │   │   ├── terms.html       # taxonomy pages
-│   │   └── single.wanderjs.js  # generates wander.js
-│   ├── wander/list.html     # /wander/ listing
-│   ├── projects/list.html   # /repo/ listing
+│   │   ├── list.svg / single.svg  # per-page OG image generator
+│   │   └── single.wanderjs.js     # generates wander.js
 │   ├── partials/
-│   │   ├── head.html        # CSS/JS bundle, schemes JSON, pre-paint restore
+│   │   ├── head.html        # CSS/JS bundle, schemes JSON, pre-paint restore, JSON-LD
 │   │   ├── menu-bar.html    # top menu bar
 │   │   ├── modeline.html    # modeline
 │   │   ├── post-listing.html
-│   │   ├── similar-posts.html      # "See Also" (tags + refs)
-│   │   ├── references.html         # auto link citations
+│   │   ├── post-icon.html          # per-row tag icon (params.tagIcons)
+│   │   ├── references.html         # "References" + "See Also" (tags + refs)
 │   │   ├── comment.html            # mailto comment box
-│   │   ├── parse-dl.html           # dt/dd parser (wander/projects)
-│   │   └── extract-href.html       # href extractor
+│   │   ├── parse-dl.html           # dt/dd parser (topic-list pages)
+│   │   ├── extract-href.html       # href extractor
+│   │   ├── topic-list-item.html    # one rendered dt/dd row
+│   │   ├── topic-list-js.html      # search filter + grid/list toggle
+│   │   ├── all-schemes.html        # merges base16 data + custom-css schemes into one list
+│   │   ├── resolve-icon.html       # icon lookup for topic-list rows
+│   │   └── lightbox.html           # click-to-zoom image dialog
 │   └── shortcodes/
 │       ├── note.html  tip.html  warn.html   # callouts
 │       ├── sidenote.html
-│       └── social-links.html
+│       ├── social-links.html
+│       └── latest.html      # links the newest post
 └── README.org
 #+end_example
 
@@ -525,30 +545,21 @@ navigation.
 Added or replaced after forking from
 [[https://github.com/ArthurHeymans/hugo-emacs-theme][hugo-emacs-theme]]:
 
-| Area                   | Change                                                                        |
-|------------------------+-------------------------------------------------------------------------------|
-| *Command palette*        | New =x=-key native =<dialog>=: post search + commands + schemes                   |
-| *Color schemes*          | Full base16 system (13 presets + 305 via tinted-theming) replacing Modus-only |
-| *Random / custom scheme* | Per-session random scheme; palette picker persists + restores before paint    |
-| *Font / width cycling*   | mono/sans/serif/mixed via =f=; four widths via =w=                                |
-| *Post navigation*        | =n=/=p= prev/next; =gg=/=gG=/=gh=/=gp=/=gw=/=gr= sequences                        |
-| *Auto references*        | External links collected into a numbered citations block                      |
-| *Similar posts*          | Matched on =tags= *and* the new =refs= taxonomy                                     |
-| *Callouts / sidenotes*   | note/tip/warn + sidenote shortcodes                                           |
-| *Comments*               | Backend-free =mailto:= comment box                                              |
-| *Wander / Projects*      | Small-web browser + project listing from org files                            |
-| *CSS*                    | ~1000 lines of dead code removed; oklch color mixins                          |
-| *JS bundle*              | 4 files → 1 deferred =app.js=                                                   |
-
---------------
-
-** Browser support
-:PROPERTIES:
-:CUSTOM_ID: browser-support
-:END:
-Modern browsers (Chrome, Firefox, Safari, Edge). Uses =<dialog>=, CSS
-custom properties, =localStorage=, =fetch=, and =color-mix()=. No
-polyfills bundled.
+| Area                     | Change                                                                                            |
+|--------------------------+---------------------------------------------------------------------------------------------------|
+| *Command palette*          | New =x=-key native =<dialog>=: post search + commands + schemes                                       |
+| *Color schemes*            | Full base16 system (13 presets + 305 via tinted-theming) replacing Modus-only                     |
+| *Random / custom scheme*   | Per-session random scheme; palette picker persists + restores before paint                        |
+| *Font / width cycling*     | mono/sans/serif/mixed via =f=; four widths via =w=                                                    |
+| *Post navigation*          | =n=/=p= prev/next; =gg=/=gG=/=gh=/=gp=/=gw=/=gr= sequences                                            |
+| *Auto references*          | External links collected into a numbered citations block                                          |
+| *Similar posts*            | Matched on =tags= *and* the new =refs= taxonomy                                                         |
+| *Callouts / sidenotes*     | note/tip/warn + sidenote shortcodes                                                               |
+| *Comments*                 | Backend-free =mailto:= comment box                                                                  |
+| *Unified listings*         | One =topic-list= layout powers Wander / Projects / Media via front matter, not directory convention |
+| *Themes gallery + sitemap* | =/themes/= live scheme gallery and auto-generated =/sitemap/=, both new generic layouts               |
+| *CSS*                      | ~1000 lines of dead code removed; oklch color mixins                                              |
+| *JS bundle*                | 4 files → 1 deferred =app.js=                                                                       |
 
 --------------
 
@@ -562,3 +573,17 @@ polyfills bundled.
 - Inspired by GNU Emacs
 
 Licensed under [[file:LICENSE-MIT][MIT]]. See [[file:LICENSE][LICENSE]] for a One Piece-flavored read of the same terms.
+
+--------------
+
+* Notes
+:PROPERTIES:
+:CUSTOM_ID: notes
+:END:
+
+** Feature ideas / issue tracker
+
+- [ ] Better handle nerd icons natively. Embed a default font so things work without issue.
+  Need nerd icon to be double spaced.
+
+- [ ] Make adding bottom stickers easier and make adding web ring easier
