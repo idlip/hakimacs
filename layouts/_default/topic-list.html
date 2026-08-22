@@ -2,11 +2,15 @@
   {{- /*
     topic-list layout — unified listing for wander, projects, media, and future topic pages.
     Activate via Org front matter: #+layout: topic-list
+    Content must have at least one H2 (Org `* Heading`) above its dt/dl item
+    list — every topic page, wander included, uses the same H2-grouped
+    rendering path below; there's no separate ungrouped/flat-list mode
+    anymore (removed 2026-08-22, wander's list now just has one H2 like any
+    other topic page instead of a special-cased branch for it).
     Config via additional #+property: front matter:
     icons_param  — site.Params key for icon map keyed by H2 label|lower; optional
     sort         — "name" to sort items alphabetically; omit to preserve Org order
     show_console — truthy: show wander launch button (uses .Params.wanderconsoles)
-    list_label   — label for the flat-list divider (e.g. "↝ Known Sites"); optional
     chip_color   — base16 var name e.g. "base0E"; sets --chip-color on chip row
     buffer_name  — override modeline buffer name; default: first word of title */ -}}
   {{- $iconsParam := .Params.icons_param | default "tagicons" -}}
@@ -14,11 +18,9 @@
   {{- $chipColor   := .Params.chip_color | default "" -}}
   {{- $doSort      := eq (.Params.sort | default "") "name" -}}
   {{- $showConsole := .Params.show_console -}}
-  {{- $listLabel   := .Params.list_label | default "" -}}
   {{- $bufName     := .Params.buffer_name | default (printf "*%s*" (.Title | lower | replaceRE `\s.*` "")) -}}
 
   {{- $chunks := split .Content "<h2" -}}
-  {{- $hasH2  := gt (len $chunks) 1 -}}
 
 
   <section
@@ -40,7 +42,7 @@
           {{- end }}
         </div>
 
-        {{- $intro := (cond $hasH2 (index $chunks 0) .Content) | replaceRE `(?s)<dl>.*?</dl>` "" -}}
+        {{- $intro := index $chunks 0 | replaceRE `(?s)<dl>.*?</dl>` "" -}}
         {{- with $intro }}
           <div class="post-body">{{ . | safeHTML }}</div>
         {{- end }}
@@ -118,65 +120,36 @@
             {{- end }}
           {{- end }}
 
-          {{- if $hasH2 }}
-            {{- /* H2-grouped items (projects, media) */}}
-            {{- range after 1 $chunks -}}
-              {{- $chunk := . -}}
-              {{- $label := $chunk | replaceRE `(?s)^[^>]*>(.*?)</h2>.*` "$1" | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
-              {{- $dts   := findRE `<dt>(?s:.*?)</dt>` $chunk -}}
-              {{- $dds   := findRE `<dd>(?s:.*?)</dd>` $chunk -}}
+          {{- range after 1 $chunks -}}
+            {{- $chunk := . -}}
+            {{- $label := $chunk | replaceRE `(?s)^[^>]*>(.*?)</h2>.*` "$1" | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
+            {{- $dts   := findRE `<dt>(?s:.*?)</dt>` $chunk -}}
+            {{- $dds   := findRE `<dd>(?s:.*?)</dd>` $chunk -}}
 
-              {{- if $label -}}
-                {{- $icon := index $iconsMap ($label | htmlUnescape | lower) | default (index $iconsMap "_default") | default "" -}}
+            {{- if $label -}}
+              {{- $icon := index $iconsMap ($label | htmlUnescape | lower) | default (index $iconsMap "_default") | default "" -}}
 
-
-                <li class="year-divider">
-                  <span class="year-label"
-                    >{{ $label | htmlUnescape }}<span class="year-count"
-                      >({{ len $dts }})</span
-                    ></span
-                  >
-                </li>
-
-                {{- $items := slice -}}
-                {{- range $i, $dt := $dts -}}
-                  {{- $items = $items | append (partial "parse-dl.html" (dict "dt" $dt "dd" (index $dds $i))) -}}
-                {{- end -}}
-                {{- if $doSort }}{{- $items = sort $items "name" }}{{- end }}
-
-                {{- range $items }}
-                  {{- $itemIcon := partial "resolve-icon.html" (dict "item" . "iconsMap" $iconsMap "fallback" $icon) -}}
-                  {{ partial "topic-list-item.html" (dict "e" . "icon" $itemIcon "chipColor" $chipColor) }}
-                {{- end -}}
-
-              {{- end -}}
-            {{- end -}}
-
-          {{- else }}
-
-            {{- /* Flat list (wander-style) */}}
-            {{- $dts  := findRE `<dt>(?s:.*?)</dt>` .Content -}}
-            {{- $dds  := findRE `<dd>(?s:.*?)</dd>` .Content -}}
-            {{- $icon := index $iconsMap "_default" | default "" -}}
-
-            {{- $items := slice -}}
-            {{- range $i, $dt := $dts -}}
-              {{- $items = $items | append (partial "parse-dl.html" (dict "dt" $dt "dd" (index $dds $i))) -}}
-            {{- end -}}
-            {{- if $doSort }}{{- $items = sort $items "name" }}{{- end }}
-
-            {{- if and $items $listLabel }}
               <li class="year-divider">
-                <span class="year-label">{{ $listLabel }}</span>
+                <span class="year-label"
+                  >{{ $label | htmlUnescape }}<span class="year-count"
+                    >({{ len $dts }})</span
+                  ></span
+                >
               </li>
-            {{- end }}
 
-            {{- range $items }}
-              {{- $itemIcon := partial "resolve-icon.html" (dict "item" . "iconsMap" $iconsMap "fallback" $icon) -}}
-              {{ partial "topic-list-item.html" (dict "e" . "icon" $itemIcon "chipColor" $chipColor) }}
+              {{- $items := slice -}}
+              {{- range $i, $dt := $dts -}}
+                {{- $items = $items | append (partial "parse-dl.html" (dict "dt" $dt "dd" (index $dds $i))) -}}
+              {{- end -}}
+              {{- if $doSort }}{{- $items = sort $items "name" }}{{- end }}
+
+              {{- range $items }}
+                {{- $itemIcon := partial "resolve-icon.html" (dict "item" . "iconsMap" $iconsMap "fallback" $icon) -}}
+                {{ partial "topic-list-item.html" (dict "e" . "icon" $itemIcon "chipColor" $chipColor) }}
+              {{- end -}}
+
             {{- end -}}
-
-          {{- end }}
+          {{- end -}}
 
         </ul>
 
