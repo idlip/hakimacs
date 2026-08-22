@@ -1507,6 +1507,15 @@
   .topic-item {
     align-items: flex-start;
     position: relative;
+    background: var(--bg-dim);
+    border: 1px solid var(--border-dim);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px color-mix(in oklch, black 12%, transparent);
+    margin-bottom: var(--space);
+    padding: 0.15em 0.3em;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
   /* Plain-text term, no <dt> link (parse-dl.html only sets data-url when one
      exists) — the card isn't a click target, so it shouldn't look like one. */
@@ -1551,8 +1560,6 @@
     grid-column: 1 / -1;
   }
   .article-list.is-grid .topic-item {
-    border: 1px solid var(--border-dim);
-    border-radius: 6px;
     padding: 0.6em 0.8em;
   }
   .article-list.is-grid .topic-item:hover {
