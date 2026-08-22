@@ -1508,6 +1508,15 @@
     align-items: flex-start;
     position: relative;
   }
+  /* Plain-text term, no <dt> link (parse-dl.html only sets data-url when one
+     exists) — the card isn't a click target, so it shouldn't look like one. */
+  .topic-item:not([data-url]) {
+    cursor: default;
+    &:is(:hover, :focus-within) {
+      border-left-color: transparent;
+      background: none;
+    }
+  }
   .topic-item .article-link {
     flex-direction: column;
     align-items: flex-start;

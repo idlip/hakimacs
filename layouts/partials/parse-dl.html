@@ -2,15 +2,18 @@
   parse-dl: parses one dt/dd pair from org-rendered description list HTML.
   Input:  dict "dt" <dt>...</dt>  "dd" <dd>...</dd>
   Returns dict:
-  url   — href from the <dt> link
-  name  — link text, tags stripped, HTML-unescaped
+  url   — href from the <dt> link, empty string if the term isn't linked
+  name  — term text, tags stripped, HTML-unescaped
   desc  — first segment before " | "
   parts — slice of remaining " | "-split segments (trimmed), for caller to parse
   */ -}}
 {{- $dt   := .dt -}}
 {{- $dd   := .dd -}}
-{{- $url  := $dt | replaceRE `(?s).*<a href="?([^ ">]+)"?.*` "$1" -}}
-{{- $name := $dt | replaceRE `(?s).*<a[^>]+>(.*?)</a>.*` "$1" | htmlUnescape | replaceRE `<[^>]+>` "" -}}
+{{- $url  := "" -}}
+{{- if findRE `<a\s` $dt 1 -}}
+  {{- $url = $dt | replaceRE `(?s).*<a href="?([^ ">]+)"?.*` "$1" -}}
+{{- end -}}
+{{- $name := $dt | replaceRE `(?s).*<a[^>]+>(.*?)</a>.*` "$1" | htmlUnescape | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
 {{- $raw  := $dd | replaceRE `(?s)<dd>\s*(.*?)\s*</dd>` "$1" -}}
 {{- $segs := split $raw " | " -}}
 {{- return dict "url" $url "name" $name "desc" (index $segs 0) "parts" (after 1 $segs) -}}

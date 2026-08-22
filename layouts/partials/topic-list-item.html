@@ -23,9 +23,11 @@
 
 <li
   class="article-item topic-item"
-  data-url="{{ .e.url }}"
-  data-title="{{ $searchText }}"
+  {{- with .e.url }}
+  data-url="{{ . }}"
   data-external="true"
+  {{- end }}
+  data-title="{{ $searchText }}"
   {{- if $chipColor }}style="--chip-color: var(--{{ $chipColor }})"{{- end }}
 >
   <div class="project-left">
@@ -33,6 +35,7 @@
   </div>
   <div class="article-link">
     <div class="project-header">
+      {{- if .e.url }}
       <a
         href="{{ .e.url }}"
         class="article-title project-name"
@@ -40,6 +43,9 @@
         rel="noopener"
         >{{ .e.name }}</a
       >
+      {{- else }}
+      <span class="article-title project-name">{{ .e.name }}</span>
+      {{- end }}
       {{- with $refPages }}
         <span class="project-refs" aria-label="related posts">
           {{- range $i, $wp := . -}}
