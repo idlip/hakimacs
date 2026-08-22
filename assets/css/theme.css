@@ -169,6 +169,21 @@
     --body-font-family: var(--code-font);
   }
 
+  /* Scale tokens: spacing / radius / transition / type */
+  :root {
+    --space: 0.5em;
+    --radius: 4px;
+    --transition: 0.15s;
+    --tracking-caps: 0.05em;
+
+    --fs-base: 1rem;
+    --fs-sm: calc(var(--fs-base) * 0.9);
+    --fs-xs: calc(var(--fs-base) * 0.85);
+    --fs-2xs: calc(var(--fs-base) * 0.8);
+    --fs-3xs: calc(var(--fs-base) * 0.78);
+    --fs-inline: 0.9em;
+  }
+
   /* ── Precise oklch hue shifts (Chrome 119+ / Safari 16.4+ / Firefox 128+) ──────────────────
    * Overrides color-mix fallbacks above with ±20° rotation in perceptual oklch space.
    * Same L and C as the base — only hue changes, so lightness/chroma stay scheme-appropriate.
@@ -294,7 +309,7 @@
     inset-inline-start: 8px;
     inset-block-start: -100%;
     z-index: 1000;
-    padding: 0.5em 1em;
+    padding: var(--space);
     background: var(--bg-main);
     color: var(--fg-main);
     border: 1px solid var(--border-highlight);
@@ -321,7 +336,7 @@
 
   body {
     font-family: var(--body-font-family, monospace);
-    font-size: 1rem;
+    font-size: var(--fs-base);
     line-height: 1.6;
     background: var(--bg-main);
     color: var(--fg-main);
@@ -426,7 +441,7 @@
   }
   h5,
   h6 {
-    font-size: 1rem;
+    font-size: var(--fs-base);
   }
   p {
     margin-bottom: 1em;
@@ -435,12 +450,12 @@
   blockquote {
     border-left: 3px solid var(--border);
     padding-left: 1em;
-    margin: 1em 0;
+    margin: var(--space);
     color: var(--fg-dim);
     font-style: italic;
   }
   :is(ul, ol) {
-    margin: 1em 0;
+    margin: var(--space);
     padding-left: 2em;
   }
   li {
@@ -449,15 +464,15 @@
   code {
     font-family: var(--code-font, monospace);
     background: var(--code-bg);
-    padding: 0.15em 0.35em;
-    font-size: 0.9em;
+    padding: var(--space);
+    font-size: var(--fs-inline);
   }
   pre {
     background: var(--code-bg);
     border: 1px solid var(--code-border);
     padding: 1em;
     overflow-x: auto;
-    margin: 1em 0;
+    margin: var(--space);
     line-height: 1.4;
     @media (width <= 480px) {
       font-size: 0.82rem;
@@ -484,14 +499,14 @@
   table {
     border-collapse: collapse;
     width: 100%;
-    margin: 1em 0;
+    margin: var(--space);
     @media (width <= 480px) {
-      font-size: 0.85rem;
+      font-size: var(--fs-xs);
     }
   }
   :is(th, td) {
     border: 1px solid var(--border);
-    padding: 0.5em 1em;
+    padding: var(--space);
     text-align: left;
   }
   th {
@@ -561,12 +576,12 @@
     color: var(--yellow);
   }
   .todo {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     font-weight: bold;
     padding: 0.1em 0.45em;
     margin-right: 0.5em;
     vertical-align: middle;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--tracking-caps);
     &.status-todo {
       background: var(--yellow);
       color: var(--bg-main);
@@ -584,7 +599,7 @@
     width: 11em;
     margin-right: -13em;
     margin-top: 0.1em;
-    font-size: 0.78rem;
+    font-size: var(--fs-3xs);
     line-height: 1.5;
     color: var(--fg-dim);
     border-left: 2px solid var(--border-dim);
@@ -605,10 +620,10 @@
   /* ── Callouts ── */
   .callout {
     border-left: 3px solid var(--border);
-    padding: 0.5em 1em;
-    margin: 1em 0;
+    padding: var(--space);
+    margin: var(--space);
     background: var(--bg-dim);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     &::before {
       display: block;
       font-size: 0.75rem;
@@ -653,11 +668,11 @@
      only applies as it did when this was a <p>. */
   .comment-label {
     display: block;
-    font-size: 0.85rem;
+    font-size: var(--fs-xs);
     color: var(--fg-dim);
     margin-bottom: 0.75em;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--tracking-caps);
   }
   .comment-textarea {
     width: 100%;
@@ -668,7 +683,7 @@
     border: 1px solid var(--border-dim);
     padding: 0.6em 0.75em;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     &:focus {
       outline: none;
       border-color: var(--border-highlight);
@@ -688,7 +703,7 @@
     background: var(--bg-active);
     border: 1px solid var(--border-highlight);
     padding: 0.4em 1em;
-    font-size: 0.85rem;
+    font-size: var(--fs-xs);
     &:hover {
       background: var(--border-highlight);
       color: var(--bg-main);
@@ -712,7 +727,7 @@
     border: 1px solid var(--code-border);
     border-radius: 0;
     padding: 0;
-    margin: 1em 0;
+    margin: var(--space);
     overflow: hidden;
     &::before {
       content: attr(data-lang);
@@ -721,7 +736,7 @@
       background-color: var(--bg-dim);
       border-bottom: 1px solid var(--code-border);
       color: var(--fg-dim);
-      font-size: 0.8rem;
+      font-size: var(--fs-2xs);
       text-transform: lowercase;
     }
     &:not([data-lang])::before {
@@ -732,7 +747,7 @@
       padding: 1em;
       overflow-x: auto;
       background: none;
-      font-size: 0.9rem;
+      font-size: var(--fs-sm);
       line-height: 1.5;
     }
   }
@@ -744,16 +759,16 @@
     z-index: 2;
     padding: 0.15em 0.6em;
     border: 1px solid var(--border-dim);
-    border-radius: 3px;
+    border-radius: var(--radius);
     background: var(--bg-dim);
     color: var(--fg-dim);
     font-size: 0.72rem;
     font-family: var(--code-font);
     opacity: 0;
     transition:
-      opacity 0.15s,
-      color 0.15s,
-      border-color 0.15s;
+      opacity var(--transition),
+      color var(--transition),
+      border-color var(--transition);
     &:hover {
       color: var(--fg-main);
       border-color: var(--border-highlight);
@@ -772,7 +787,7 @@
   /* ── Chroma syntax highlighting (Hugo default classes) ── */
   .highlight {
     background-color: var(--code-bg);
-    margin: 1em 0;
+    margin: var(--space);
     & pre {
       margin: 0;
       border: 1px solid var(--code-border);
@@ -919,7 +934,7 @@
 
   /* ── Org-mode source blocks ── */
   .org-src-container {
-    margin: 1em 0;
+    margin: var(--space);
     & pre {
       margin: 0;
     }
@@ -927,36 +942,36 @@
   .org-block-begin-line,
   .org-block-end-line {
     color: var(--fg-dim);
-    font-size: 0.85rem;
-    padding: 0.25em 0.5em;
+    font-size: var(--fs-xs);
+    padding: var(--space);
     background-color: var(--bg-dim);
     border: 1px solid var(--code-border);
   }
   .org-block-begin-line {
     border-bottom: none;
-    border-radius: 3px 3px 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
   .org-block-end-line {
     border-top: none;
-    border-radius: 0 0 3px 3px;
+    border-radius: 0 0 var(--radius) var(--radius);
   }
 
   /* ── Inline code ── */
   code:not(pre code) {
     background-color: var(--code-bg);
-    padding: 0.15em 0.35em;
-    border-radius: 2px;
-    font-size: 0.9em;
+    padding: var(--space);
+    border-radius: var(--radius);
+    font-size: var(--fs-inline);
     color: var(--cyan);
   }
   .org-verbatim {
     background-color: var(--code-bg);
-    padding: 0.1em 0.3em;
+    padding: var(--space);
     color: var(--green);
   }
   .org-code {
     background-color: var(--code-bg);
-    padding: 0.1em 0.3em;
+    padding: var(--space);
     color: var(--cyan);
   }
 }
@@ -991,11 +1006,11 @@
     display: flex;
     align-items: baseline;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     border-left: 2px solid transparent;
     transition:
-      border-color 0.15s,
-      background-color 0.15s;
+      border-color var(--transition),
+      background-color var(--transition);
     &:is(:hover, :focus-within) {
       border-left-color: var(--cursor);
       background: var(--list-hover-bg);
@@ -1009,7 +1024,7 @@
   .article-meta {
     display: flex;
     gap: 1em;
-    font-size: 0.85rem;
+    font-size: var(--fs-xs);
     flex-shrink: 0;
     margin-right: 1em;
   }
@@ -1069,7 +1084,7 @@
   }
 
   .breadcrumbs {
-    font-size: 0.8rem;
+    font-size: var(--fs-2xs);
     color: var(--fg-dim);
     margin-bottom: 1.5em;
     opacity: 0.75;
@@ -1132,7 +1147,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1em;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     color: var(--fg-dim);
   }
   .post-date {
@@ -1140,7 +1155,7 @@
   }
   .post-date-updated {
     color: var(--fg-dim);
-    font-size: 0.9em;
+    font-size: var(--fs-inline);
   }
   .post-reading-time {
     color: var(--cyan);
@@ -1162,9 +1177,9 @@
     background: var(--bg-dim);
     border: 1px solid var(--border-dim);
     padding: 1em;
-    margin: 1em 0;
+    margin: var(--space);
     & h2 {
-      font-size: 1rem;
+      font-size: var(--fs-base);
       margin: 0 0 0.5em;
       color: var(--fg-main);
     }
@@ -1201,8 +1216,8 @@
       text-decoration: none;
       opacity: 0;
       transition:
-        opacity 0.15s,
-        color 0.15s;
+        opacity var(--transition),
+        color var(--transition);
     }
     & :is(h2, h3, h4, h5, h6):hover .heading-anchor,
     & .heading-anchor:focus-visible {
@@ -1241,7 +1256,7 @@
   .year-label {
     font-weight: bold;
     color: var(--magenta);
-    letter-spacing: 0.05em;
+    letter-spacing: var(--tracking-caps);
     opacity: 0.9;
   }
   .year-count {
@@ -1271,7 +1286,7 @@
     gap: 0.3em;
     & li {
       color: var(--fg-dim);
-      font-size: 0.9rem;
+      font-size: var(--fs-sm);
     }
     & a {
       color: var(--blue);
@@ -1289,7 +1304,7 @@
     display: flex;
     align-items: baseline;
     gap: 0.5em;
-    padding: 0.5em 0.75em;
+    padding: var(--space);
     border-bottom: 1px solid var(--border-dim);
     background: var(--bg-dim);
   }
@@ -1300,7 +1315,7 @@
   }
   .term-back {
     margin-left: auto;
-    font-size: 0.8rem;
+    font-size: var(--fs-2xs);
     color: var(--yellow-cooler);
     text-decoration: none;
     opacity: 0.8;
@@ -1314,7 +1329,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.35em;
-    padding: 0.5em 0.75em;
+    padding: var(--space);
     border-bottom: 1px solid var(--border-dim);
     background: var(--bg-dim);
   }
@@ -1324,14 +1339,14 @@
     gap: 0.25em;
     padding: 0.15em 0.5em;
     border: 1px solid var(--border);
-    border-radius: 2px;
+    border-radius: var(--radius);
     color: var(--cyan-cooler);
-    font-size: 0.78rem;
+    font-size: var(--fs-3xs);
     opacity: 0.8;
     transition:
-      opacity 0.1s,
-      border-color 0.1s,
-      background 0.1s;
+      opacity var(--transition),
+      border-color var(--transition),
+      background var(--transition);
     &:is(:hover, :focus-visible) {
       opacity: 1;
       border-color: var(--cyan-cooler);
@@ -1359,7 +1374,7 @@
     border-radius: 0.3em;
     margin: 1.5em 0;
     background: var(--bg-main);
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
   }
   .list-search-prompt {
     color: var(--cyan-cooler);
@@ -1382,14 +1397,14 @@
   }
   .list-search-count {
     color: var(--yellow-cooler);
-    font-size: 0.8rem;
+    font-size: var(--fs-2xs);
     flex-shrink: 0;
   }
 
   .list-footer {
     border-top: 1px solid var(--border-dim);
     padding: 0.75em 1em;
-    font-size: 0.8rem;
+    font-size: var(--fs-2xs);
     color: var(--fg-dim);
     text-align: center;
     & a {
@@ -1408,7 +1423,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.6em;
-    margin: 1em 0;
+    margin: var(--space);
   }
   .social-links.is-grid {
     display: grid;
@@ -1421,11 +1436,11 @@
     gap: 0.6em;
     color: var(--fg-main);
     text-decoration: none;
-    padding: 0.25em 0.5em;
+    padding: var(--space);
     border-left: 2px solid transparent;
     transition:
-      border-color 0.15s,
-      background 0.15s;
+      border-color var(--transition),
+      background var(--transition);
     &:is(:hover, :focus-visible) {
       border-left-color: var(--cursor);
       background: var(--bg-active);
@@ -1434,7 +1449,7 @@
     }
   }
   .social-label {
-    font-size: 0.9em;
+    font-size: var(--fs-inline);
     color: var(--fg-dim);
   }
 
@@ -1449,7 +1464,7 @@
   }
   .wander-hint {
     flex: 1;
-    font-size: 0.85rem;
+    font-size: var(--fs-xs);
     color: var(--fg-dim);
   }
   .wander-btn {
@@ -1461,8 +1476,8 @@
     color: var(--cyan-cooler);
     background: var(--bg-dim);
     text-decoration: none;
-    font-size: 0.85rem;
-    transition: border-color 0.1s;
+    font-size: var(--fs-xs);
+    transition: border-color var(--transition);
     &:is(:hover, :focus-visible) {
       border-color: var(--cyan-cooler);
     }
@@ -1476,7 +1491,7 @@
     color: var(--blue);
   }
   .wander-desc {
-    font-size: 0.85rem;
+    font-size: var(--fs-xs);
     color: var(--fg-alt);
     min-width: 0;
   }
@@ -1521,7 +1536,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
     gap: 0.6em;
-    padding: 0.5em 0.75em;
+    padding: var(--space);
   }
   .article-list.is-grid .year-divider {
     grid-column: 1 / -1;
@@ -1565,7 +1580,7 @@
   .scheme-card-variant {
     font-size: 0.7rem;
     padding: 0.1em 0.5em;
-    border-radius: 3px;
+    border-radius: var(--radius);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: var(--fg-dim);
@@ -1578,11 +1593,11 @@
   .scheme-card-swatches .swatch {
     width: 1rem;
     height: 1rem;
-    border-radius: 2px;
+    border-radius: var(--radius);
     flex-shrink: 0;
   }
   .scheme-card-author {
-    font-size: 0.78rem;
+    font-size: var(--fs-3xs);
     color: var(--fg-dim);
     text-decoration: none;
     &:is(:hover, :focus-visible) {
@@ -1666,7 +1681,7 @@
     background: var(--menu-bg);
     border-bottom: 1px solid var(--menu-border);
     padding: 0;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     user-select: none;
     /* Fixed so it never moves/jitters during momentum scroll. body reserves the
        space with padding-top: var(--menu-h), and this height makes the bar match
@@ -1699,7 +1714,7 @@
       align-items: center;
       padding: 0.4em 0.8em;
       color: var(--menu-fg);
-      transition: background-color 0.1s;
+      transition: background-color var(--transition);
       & .underline {
         text-decoration: underline;
       }
@@ -1733,7 +1748,7 @@
     gap: 2em;
     padding: 0.4em 1em;
     color: var(--menu-fg);
-    transition: background-color 0.1s;
+    transition: background-color var(--transition);
     width: 100%;
     /* Keep label left + shortcut right on one line; dropdown widens to fit. */
     white-space: nowrap;
@@ -1783,7 +1798,7 @@
     border: 1.5px solid var(--p-accent, currentColor);
     background: transparent;
     flex-shrink: 0;
-    transition: background 0.1s;
+    transition: background var(--transition);
   }
 
   .scheme-popup-actions {
@@ -1800,8 +1815,8 @@
     color: var(--fg-dim);
     font-size: 0.82rem;
     transition:
-      background 0.1s,
-      color 0.1s;
+      background var(--transition),
+      color var(--transition);
     &:is(:hover, :focus-visible) {
       background: var(--menu-hover-bg);
       color: var(--fg-main);
@@ -1820,14 +1835,14 @@
     align-items: center;
     padding: 0.3em 0.55em;
     border: 1px solid var(--border-dim);
-    border-radius: 3px;
+    border-radius: var(--radius);
     color: var(--fg-dim);
     font-family: "Symbols Nerd Font Mono", inherit;
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
     transition:
-      background 0.12s,
-      color 0.12s,
-      border-color 0.12s;
+      background var(--transition),
+      color var(--transition),
+      border-color var(--transition);
     margin-left: 0.3em;
   }
   :is(.menu-bar-btn, .scheme-popup-btn):is(
@@ -1883,7 +1898,7 @@
   /* Site title */
   .menu-bar-title {
     color: var(--fg-dim);
-    font-size: 0.85rem;
+    font-size: var(--fs-xs);
     padding: 0 1em;
     text-decoration: none;
     &:is(:hover, :focus-visible) {
@@ -1931,7 +1946,7 @@
     will-change: transform;
     @media (width <= 768px) {
       padding: 0.2em 0.5em;
-      font-size: 0.78rem;
+      font-size: var(--fs-3xs);
       padding-bottom: max(0.2em, env(safe-area-inset-bottom, 0));
     }
   }
@@ -1987,9 +2002,9 @@
     color: var(--fg-dim);
     opacity: 0.7;
     transition:
-      opacity 0.15s,
-      color 0.15s;
-    border-radius: 2px;
+      opacity var(--transition),
+      color var(--transition);
+    border-radius: var(--radius);
     padding: 0 0.4ch;
     &:hover {
       opacity: 1;
@@ -2018,7 +2033,7 @@
   }
   .ml-date-icon {
     color: var(--yellow-faint);
-    font-size: 0.9em;
+    font-size: var(--fs-inline);
   }
   .ml-wc {
     color: var(--blue-faint);
@@ -2026,7 +2041,7 @@
   .ml-readtime {
     color: var(--cyan-faint);
     opacity: 0.75;
-    font-size: 0.9em;
+    font-size: var(--fs-inline);
   }
   .ml-date {
     color: var(--yellow-faint);
@@ -2049,9 +2064,9 @@
     max-width: min(52ch, 45vw);
     text-overflow: ellipsis;
     transition:
-      opacity 0.15s,
-      background 0.15s;
-    border-radius: 2px;
+      opacity var(--transition),
+      background var(--transition);
+    border-radius: var(--radius);
     &:hover {
       opacity: 1;
     }
@@ -2101,7 +2116,7 @@
     outline: none;
     color: var(--fg-main);
     font-family: var(--code-font), monospace;
-    font-size: 1rem;
+    font-size: var(--fs-base);
     &::placeholder {
       color: var(--fg-dim);
     }
@@ -2231,7 +2246,7 @@
     }
     .article-item {
       flex-wrap: wrap;
-      padding: 0.5em 0.75em;
+      padding: var(--space);
     }
     .article-title {
       width: 100%;
@@ -2300,12 +2315,12 @@
     }
     .wander-list .article-date {
       flex: 0 0 auto;
-      font-size: 0.8rem;
+      font-size: var(--fs-2xs);
     }
     .wander-list .wander-desc {
       flex: 0 0 100%;
       padding-left: 0;
-      font-size: 0.78rem;
+      font-size: var(--fs-3xs);
       opacity: 0.8;
     }
 
@@ -2324,7 +2339,7 @@
   /* Small mobile */
   @media screen and (width <= 480px) {
     body {
-      font-size: 0.9rem;
+      font-size: var(--fs-sm);
     }
     .article-item {
       padding: 0.5em;
@@ -2335,7 +2350,7 @@
     }
     .tag-cloud-btn {
       font-size: 0.75rem;
-      padding: 0.25em 0.5em;
+      padding: var(--space);
     }
     .list-search {
       margin: 0.4em 0;
@@ -2350,13 +2365,13 @@
     }
     .post-meta {
       gap: 0.5em;
-      font-size: 0.8rem;
+      font-size: var(--fs-2xs);
     }
     pre code {
-      font-size: 0.8rem;
+      font-size: var(--fs-2xs);
     }
     .social-links {
-      font-size: 1rem;
+      font-size: var(--fs-base);
     }
   }
 
