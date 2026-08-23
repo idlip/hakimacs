@@ -10,7 +10,7 @@
     Config via additional #+property: front matter:
     icons_param  — site.Params key for icon map keyed by H2 label|lower; optional
     sort         — "name" to sort items alphabetically; omit to preserve Org order
-    show_console — truthy: show wander launch button (uses .Params.wanderconsoles)
+    show_console — truthy: show a "Launch Wander Console" button linking to /wander/console/
     chip_color   — base16 var name e.g. "base0E"; sets --chip-color on chip row
     buffer_name  — override modeline buffer name; default: first word of title */ -}}
   {{- $iconsParam := .Params.icons_param | default "tagicons" -}}
@@ -85,41 +85,6 @@
         </div>
 
         <ul class="article-list wander-list" id="article-list" role="list">
-          {{- /* Neighbour consoles (wander #+wanderconsoles) */}}
-          {{- $consoles := split (.Params.wanderconsoles | default "") "|" -}}
-          {{- if and (gt (len $consoles) 0) (index $consoles 0) }}
-            <li class="year-divider">
-              <span class="year-label"
-                ><span class="nf" aria-hidden="true">󰙴</span> Neighbour
-                Consoles</span
-              >
-            </li>
-            {{- range $consoles }}
-              {{- if . }}
-                {{- $parts  := split . "::" -}}
-                {{- $curl   := index $parts 0 -}}
-                {{- $clabel := index $parts 1 | default "console" -}}
-                <li
-                  class="article-item topic-item"
-                  data-url="{{ $curl }}"
-                  data-title="{{ $curl | lower }}"
-                  data-external="true"
-                >
-                  <a
-                    href="{{ $curl }}"
-                    class="article-link"
-                    target="_blank"
-                    rel="noopener"
-                    aria-label="{{ $clabel }}"
-                  >
-                    <span class="article-title">{{ $curl }}</span>
-                    <span class="article-date">{{ $clabel }}</span>
-                  </a>
-                </li>
-              {{- end }}
-            {{- end }}
-          {{- end }}
-
           {{- range after 1 $chunks -}}
             {{- $chunk := . -}}
             {{- $label := $chunk | replaceRE `(?s)^[^>]*>(.*?)</h2>.*` "$1" | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}

@@ -366,7 +366,7 @@ python3 parse-scheme.py data/schemes/dracula.yaml --dark
 | Section      | URL example     | Activated by             | Notes                                                                                                                                      |
 |--------------+-----------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------|
 | *Posts*        | =/posts/=         | Hugo's default =list.html= | Main blog.                                                                                                                                 |
-| *Wander*       | =/wander/=        | =#+layout: topic-list=     | Small-web browser. Sites are an org description list; =#+wanderconsoles:= lists console IDs.                                                 |
+| *Wander*       | =/wander/=        | =#+layout: topic-list=     | Small-web browser. Both the site list and any neighbour consoles are just =dt/dl= groups under their own H2, same as any other topic-list page. |
 | *Projects*     | =/projects/=      | =#+layout: topic-list=     | Org H2 sections become year/group headers with a count badge; items are =dt/dd= pairs supporting =tags:=, =refs:=, or any =key: value= metadata.   |
 | *Media*        | =/media/=         | =#+layout: topic-list=     | Same listing, different content --- H2-grouped =dt/dd= entries.                                                                              |
 | *Color Themes* | =/themes/=        | =#+layout: themes=         | Live-preview gallery of every base16 scheme (=partial "all-schemes.html"=); hover to preview, click to apply + pin.                          |

@@ -11,9 +11,10 @@
 {{- $dd   := .dd -}}
 {{- $url  := "" -}}
 {{- if findRE `<a\s` $dt 1 -}}
-  {{- $url = $dt | replaceRE `(?s).*<a href="?([^ ">]+)"?.*` "$1" -}}
+  {{- /* show even if has no href link */ -}}
+  {{- $url = $dt | replaceRE `(?s).*?<a href="?([^ ">]+)"?.*` "$1" -}}
 {{- end -}}
-{{- $name := $dt | replaceRE `(?s).*<a[^>]+>(.*?)</a>.*` "$1" | htmlUnescape | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
+{{- $name := $dt | replaceRE `(?s).*?<a[^>]+>(.*?)</a>.*` "$1" | htmlUnescape | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
 {{- $raw  := $dd | replaceRE `(?s)<dd>\s*(.*?)\s*</dd>` "$1" -}}
 {{- $segs := split $raw " | " -}}
 {{- return dict "url" $url "name" $name "desc" (index $segs 0) "parts" (after 1 $segs) -}}
