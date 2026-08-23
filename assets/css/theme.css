@@ -1353,20 +1353,18 @@
     padding: 0.15em 0.5em;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    color: var(--cyan-cooler);
+    color: var(--fg-dim);
     font-size: var(--fs-3xs);
-    opacity: 0.8;
     transition:
-      opacity var(--transition),
+      color var(--transition),
       border-color var(--transition),
       background var(--transition);
     &:is(:hover, :focus-visible) {
-      opacity: 1;
+      color: var(--cyan-cooler);
       border-color: var(--cyan-cooler);
       background: var(--bg-active);
     }
     &.active {
-      opacity: 1;
       border-color: var(--cursor);
       background: var(--bg-hl-line);
       color: var(--cursor);
