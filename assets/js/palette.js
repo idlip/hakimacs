@@ -273,24 +273,17 @@
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   }
 
-  function match(str, q) {
-    if (!q) return esc(str);
+  // Marks whichever of `words` occur in `str`, best-effort (no all-present check).
+  function highlightWords(str, words) {
     var lo = str.toLowerCase(),
-      tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
-    if (
-      !tokens.every(function (t) {
-        return lo.includes(t);
-      })
-    )
-      return null;
-    var m = new Uint8Array(str.length),
+      m = new Uint8Array(str.length),
       r = "",
       in_ = false;
-    tokens.forEach(function (t) {
-      var i = lo.indexOf(t);
+    words.forEach(function (w) {
+      var i = lo.indexOf(w);
       while (i >= 0) {
-        m.fill(1, i, i + t.length);
-        i = lo.indexOf(t, i + 1);
+        m.fill(1, i, i + w.length);
+        i = lo.indexOf(w, i + 1);
       }
     });
     for (var i = 0; i < str.length; i++) {
@@ -304,6 +297,19 @@
       r += esc(str[i]);
     }
     return in_ ? r + "</mark>" : r;
+  }
+
+  function match(str, q) {
+    if (!q) return esc(str);
+    var lo = str.toLowerCase(),
+      tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (
+      !tokens.every(function (t) {
+        return lo.includes(t);
+      })
+    )
+      return null;
+    return highlightWords(str, tokens);
   }
 
   function buildList() {
@@ -322,8 +328,15 @@
                   ic +
                   "</span>"
                 : "") +
+              '<span class="palette-item-text">' +
               '<span class="palette-item-title">' +
               it.html +
+              "</span>" +
+              (it.snippet
+                ? '<span class="palette-item-snippet">' +
+                  it.snippet +
+                  "</span>"
+                : "") +
               "</span></div>"
             );
           })
@@ -432,6 +445,7 @@
         "Search posts, run commands, browse themes  (M-x \u00b7 Ctrl-P \u00b7 Ctrl-K)\u2026";
       var q = v.trim();
       items = [];
+      var seenUrls = {};
       CMDS.forEach(function (c) {
         var h = match(c.t, q);
         if (h !== null) items.push({ html: h, action: c.a, type: c.type });
@@ -439,7 +453,8 @@
       (window.__posts || []).forEach(function (p) {
         var url = p.url,
           h = match(p.title, q);
-        if (h !== null)
+        if (h !== null) {
+          seenUrls[url] = true;
           items.push({
             html: h,
             action: function () {
@@ -447,6 +462,7 @@
             },
             type: "post",
           });
+        }
       });
       // Matching tags after posts (only when searching), so "emacs" lists posts
       // first, then "#Emacs" as a jump to the tag page.
@@ -464,6 +480,24 @@
             });
           }
         });
+      // Implicit full-text search once the query is long enough.
+      if (q.length > 5 && window.emacsBlog.search) {
+        window.emacsBlog.search.load(function () {
+          render(inp.value);
+        });
+        var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+        window.emacsBlog.search.find(q).forEach(function (r) {
+          if (seenUrls[r.url]) return;
+          items.push({
+            html: esc(r.title),
+            snippet: highlightWords(r.snippet, words),
+            action: function () {
+              location.href = r.url + "#:~:text=" + encodeURIComponent(r.hit);
+            },
+            type: "post",
+          });
+        });
+      }
       items = items.slice(0, 30);
       buildList();
     }
@@ -481,8 +515,12 @@
       applyCustomPalette(items[idx].colors);
   }
 
+  var renderTimer = null;
   inp.addEventListener("input", function () {
-    render(inp.value);
+    clearTimeout(renderTimer);
+    renderTimer = setTimeout(function () {
+      render(inp.value);
+    }, 500);
   });
   inp.addEventListener("keydown", function (e) {
     if (e.key === "ArrowDown" || (e.ctrlKey && e.key === "n")) {

@@ -1,0 +1,17 @@
+{{- /* Search index: one entry per sentence across all RegularPages. */ -}}
+{{- $items := slice -}}
+{{- range site.RegularPages -}}
+  {{- $title := .Title -}}
+  {{- $url := .RelPermalink -}}
+  {{- $plain := .Plain | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
+  {{- $sep := printf "%c" 1 -}}
+  {{- $marked := $plain | replaceRE `([.!?])\s+` (printf "$1%s" $sep) -}}
+  {{- range split $marked $sep -}}
+    {{- $text := strings.TrimSpace . -}}
+    {{- if gt (len $text) 3 -}}
+      {{- $tokens := ($text | lower | findRE `[a-z0-9]+`) | default (slice) -}}
+      {{- $items = $items | append (dict "title" $title "url" $url "text" $text "tokens" $tokens) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{ $items | jsonify }}

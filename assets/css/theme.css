@@ -390,6 +390,10 @@
     background: var(--selection-bg);
     color: var(--selection-fg);
   }
+  ::target-text {
+    background: var(--yellow-faint);
+    color: var(--fg-main);
+  }
   a {
     color: var(--link);
     text-decoration: none;
@@ -2148,7 +2152,7 @@
   .palette-item {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     padding: 0.45em 1em;
     cursor: pointer;
     border-bottom: 1px solid var(--border-dim);
@@ -2168,11 +2172,26 @@
     color: var(--fg-dim);
     opacity: 0.85;
   }
-  .palette-item-title {
+  .palette-item-text {
+    display: flex;
+    flex-direction: column;
     flex: 1;
     min-width: 0;
+    gap: 0.15em;
+  }
+  .palette-item-title {
     font-size: 0.92rem;
     color: var(--fg-main);
+  }
+  /* Search-result body excerpt — clamped to 2 lines regardless of match position. */
+  .palette-item-snippet {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    color: var(--fg-dim);
   }
 
   /* ── Image lightbox (native <dialog>) ── */

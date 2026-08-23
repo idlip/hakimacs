@@ -231,9 +231,10 @@
 </script> {{- /* app.js bundle — defer so it doesn't block first paint */ -}}
 {{- $keyboard := resources.Get "js/keyboard.js" -}}
 {{- $menu := resources.Get "js/menu.js" -}}
+{{- $search := resources.Get "js/search.js" -}}
 {{- $palette := resources.Get "js/palette.js" -}}
 {{- $themesGallery := resources.Get "js/themes-gallery.js" -}}
-{{- $jsBundle := slice $keyboard $menu $palette $themesGallery | resources.Concat "js/app.js" | minify | fingerprint -}}
+{{- $jsBundle := slice $keyboard $menu $search $palette $themesGallery | resources.Concat "js/app.js" | minify | fingerprint -}}
 <script src="{{ $jsBundle.RelPermalink }}" defer></script>
 
 {{- /* Prerender same-origin links on hover for near-instant forward nav.
