@@ -17,8 +17,8 @@
       {{- /* .post-body so home prose reads like a post body and responds to the
              `a` alignment cycle (normal / justify / columns). */ -}}
       <div class="post-body">{{ .Content |
-        replaceRE `(<img[^>]*\balt=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)</figcaption>` `${1}${3}${2}<figcaption>${3}</figcaption>` |
-        replaceRE `(<img[^>]*\btitle=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)</figcaption>` `${1}${3}${2}<figcaption>${3}</figcaption>` |
+        replaceRE `(<img[^>]*\balt=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)` `${1}${3}${2}<figcaption>${3}` |
+        replaceRE `(<img[^>]*\btitle=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)` `${1}${3}${2}<figcaption>${3}` |
         replaceRE `<img ` `<img loading="lazy" decoding="async" ` |
         safeHTML }}</div>
     </article>

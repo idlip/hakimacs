@@ -500,6 +500,19 @@
     align-items: center;
     text-align: center;
   }
+  .grid-block {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space);
+    margin: var(--space) 0;
+    & figure {
+      margin: 0;
+    }
+    & img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+    }
+  }
   table {
     border-collapse: collapse;
     width: 100%;
