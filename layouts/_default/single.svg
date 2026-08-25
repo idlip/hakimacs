@@ -1,10 +1,16 @@
 {{- /* Per-post OG image source (rasterized to /og/<slug>.png by `just og`).
        Renders through the shared og-card partial. */ -}}
-{{- $ex := .Description -}}{{- if not $ex -}}{{- $ex = .Summary | plainify -}}{{- end -}}
+{{- $excerpt := .Description -}}
+{{- if not $excerpt -}}
+  {{- $paragraphs := findRE `(?is)<p[^>]*>.*?</p>` .Summary 2 -}}
+  {{- $plainParagraphs := slice -}}
+  {{- range $paragraphs -}}{{- $plainParagraphs = $plainParagraphs | append (. | plainify) -}}{{- end -}}
+  {{- $excerpt = cond (gt (len $plainParagraphs) 0) (delimit $plainParagraphs "\n") (.Summary | plainify) -}}
+{{- end -}}
 {{- $fav := "" -}}{{- with .Site.Params.favicon -}}{{- $fav = resources.Get (. | strings.TrimPrefix "/") -}}{{- end -}}
 {{- partial "og-card.svg" (dict
   "title" .Title
-  "excerpt" $ex
+  "excerpt" $excerpt
   "tags" .Params.tags
   "slug" .File.ContentBaseName
   "date" (.Date.Format "2006-01-02")

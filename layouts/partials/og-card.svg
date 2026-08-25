@@ -30,19 +30,26 @@
 {{- with .tags -}}{{- range first 3 . -}}{{- $tagparts = $tagparts | append (printf "#%s" .) -}}{{- end -}}{{- end -}}
 {{- $tagstr := delimit $tagparts "  " -}}
 
-{{- /* excerpt: <=62 chars, 5 lines, ellipsis if longer */ -}}
-{{- $el := slice -}}{{- $ecur := "" -}}
+{{- /* excerpt: <=62 chars/line, 5 lines total, ellipsis if longer.
+       "\n\n" between paragraphs (see single.svg/list.svg) is a hard break,
+       kept as a blank rendered line rather than collapsed into one run-on
+       line of text. */ -}}
+{{- $excerptLines := slice -}}
 {{- with .excerpt -}}
-{{- $ex := . | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
-{{- range $w := split $ex " " -}}
-  {{- $try := cond (eq $ecur "") $w (printf "%s %s" $ecur $w) -}}
-  {{- if gt (len $try) 62 -}}{{- $el = $el | append $ecur -}}{{- $ecur = $w -}}
-  {{- else -}}{{- $ecur = $try -}}{{- end -}}
+{{- $excerptText := . | htmlUnescape | strings.TrimSpace -}}
+{{- range $sourceLine := split $excerptText "\n" -}}
+  {{- $cleanLine := $sourceLine | replaceRE `[ \t]+` " " | strings.TrimSpace -}}
+  {{- $currentLine := "" -}}
+  {{- range $word := split $cleanLine " " -}}
+    {{- $candidateLine := cond (eq $currentLine "") $word (printf "%s %s" $currentLine $word) -}}
+    {{- if gt (len $candidateLine) 62 -}}{{- $excerptLines = $excerptLines | append $currentLine -}}{{- $currentLine = $word -}}
+    {{- else -}}{{- $currentLine = $candidateLine -}}{{- end -}}
+  {{- end -}}
+  {{- $excerptLines = $excerptLines | append $currentLine -}}
 {{- end -}}
-{{- if $ecur -}}{{- $el = $el | append $ecur -}}{{- end -}}
 {{- end -}}
-{{- $emore := gt (len $el) 5 -}}{{- $el = first 5 $el -}}
-{{- if $emore -}}{{- $el = (first 4 $el) | append (printf "%s…" (index $el 4)) -}}{{- end -}}
+{{- $hasMoreLines := gt (len $excerptLines) 5 -}}{{- $excerptLines = first 5 $excerptLines -}}
+{{- if $hasMoreLines -}}{{- $excerptLines = (first 4 $excerptLines) | append (printf "%s…" (index $excerptLines 4)) -}}{{- end -}}
 
 {{- $titleTop := 180 -}}
 {{- $titleLast := add $titleTop (mul (sub (len $tl) 1) (add $tfs 12)) -}}
@@ -61,6 +68,7 @@
   <text x="36" y="46" fill="#b4aeae" font-size="34">&#x2261;</text>
   <rect x="80" y="19" width="2" height="30" fill="#248f6c" opacity="0.6"/>
   <text x="100" y="46" fill="#5fd7af" font-size="30" font-weight="bold">{{ .siteTitle | htmlEscape }}</text>
+  <text x="1164" y="46" fill="#5fd7af" font-size="22" text-anchor="end" opacity="0.85">&#xf0a08; Will of D. &#xf0833;</text>
 
   <!-- title -->
   {{- range $i, $l := $tl }}
@@ -73,7 +81,7 @@
   {{- end }}
 
   <!-- excerpt -->
-  {{- range $i, $l := $el }}
+  {{- range $i, $l := $excerptLines }}
   <text x="80" y="{{ add $exTop (mul $i 40) }}" fill="#9aa0a6" font-size="24">{{ $l | htmlEscape }}</text>
   {{- end }}
 
