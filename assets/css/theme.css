@@ -1709,6 +1709,7 @@
 @layer chrome {
   /* ── Menu bar (fixed top; mirrors the fixed modeline) ── */
   .menu-bar {
+    view-transition-name: menu-bar;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1955,6 +1956,7 @@
 @layer chrome {
   /* ── Modeline (fixed bottom; Emacs mode-line) ── */
   .modeline {
+    view-transition-name: modeline;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -2475,6 +2477,19 @@
     }
   }
 
+  /* Cross-document View Transitions: tuning. */
+  ::view-transition-old(menu-bar),
+  ::view-transition-new(menu-bar) {
+    animation: none;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(modeline),
+  ::view-transition-new(modeline) {
+    mix-blend-mode: normal;
+    animation-duration: 0.18s;
+  }
+
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -2483,6 +2498,11 @@
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+    }
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
     }
   }
 }
