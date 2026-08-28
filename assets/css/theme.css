@@ -175,6 +175,9 @@
     --radius: 4px;
     --transition: 0.15s;
     --tracking-caps: 0.05em;
+    --backdrop-dim: 30%;
+    --backdrop-blur: 5px;
+    --chrome-bg-opacity: 88%;
 
     --fs-base: 1rem;
     --fs-sm: calc(var(--fs-base) * 0.9);
@@ -1007,7 +1010,6 @@
   }
   .buffer-body {
     overflow-x: hidden;
-    background: var(--bg-main);
   }
 
   /* ── Article list (Dired-style) ── */
@@ -1713,7 +1715,9 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    background: var(--menu-bg);
+    background: color-mix(in oklch, var(--menu-bg) var(--chrome-bg-opacity), transparent);
+    backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     border-bottom: 1px solid var(--menu-border);
     padding: 0;
     font-size: var(--fs-sm);
@@ -1911,7 +1915,9 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: color-mix(in oklch, black 45%, transparent);
+    background: color-mix(in oklch, black var(--backdrop-dim), transparent);
+    backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     z-index: 198;
     &.visible {
       display: block;
@@ -1967,7 +1973,9 @@
     padding: 0.8em 1.5em 0.8em 0.4em;
     /* iOS home indicator: keep the bar above the safe-area inset. */
     padding-bottom: max(0.8em, env(safe-area-inset-bottom, 0));
-    background-color: var(--bg-dim);
+    background-color: color-mix(in oklch, var(--bg-dim) var(--chrome-bg-opacity), transparent);
+    backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     color: var(--modeline-fg);
     font-family: var(--code-font), monospace;
     font-size: 0.82rem;
@@ -2134,7 +2142,9 @@
       overflow: hidden;
     }
     &::backdrop {
-      background: color-mix(in oklch, black 60%, transparent);
+      background: color-mix(in oklch, black var(--backdrop-dim), transparent);
+      backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+      -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     }
   }
 
@@ -2220,7 +2230,9 @@
     max-height: 92vh;
     margin: auto;
     &::backdrop {
-      background: color-mix(in oklch, black 75%, transparent);
+      background: color-mix(in oklch, black var(--backdrop-dim), transparent);
+      backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+      -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     }
     & img {
       display: block;
