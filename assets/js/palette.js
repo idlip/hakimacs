@@ -258,6 +258,7 @@
     items = [];
   var allSchemes = null,
     snap = null;
+  var searchTimer = null;
 
   function snapRestore() {
     if (snap)
@@ -480,26 +481,34 @@
             });
           }
         });
-      // Implicit full-text search once the query is long enough.
-      if (q.length > 5 && window.emacsBlog.search) {
-        window.emacsBlog.search.load(function () {
-          render(inp.value);
-        });
-        var words = q.toLowerCase().split(/\s+/).filter(Boolean);
-        window.emacsBlog.search.find(q).forEach(function (r) {
-          if (seenUrls[r.url]) return;
-          items.push({
-            html: esc(r.title),
-            snippet: highlightWords(r.snippet, words),
-            action: function () {
-              location.href = r.url + "#:~:text=" + encodeURIComponent(r.hit);
-            },
-            type: "post",
-          });
-        });
-      }
       items = items.slice(0, 30);
       buildList();
+
+      // debounce index search
+      clearTimeout(searchTimer);
+      if (q.length > 5 && window.emacsBlog.search) {
+        searchTimer = setTimeout(function () {
+          if (inp.value.trim() !== q) return; // query changed since scheduling
+          window.emacsBlog.search.load(function () {
+            render(inp.value);
+          });
+          var words = q.toLowerCase().split(/\s+/).filter(Boolean);
+          window.emacsBlog.search.find(q).forEach(function (r) {
+            if (seenUrls[r.url]) return;
+            items.push({
+              html: esc(r.title),
+              snippet: highlightWords(r.snippet, words),
+              action: function () {
+                location.href =
+                  r.url + "#:~:text=" + encodeURIComponent(r.hit);
+              },
+              type: "post",
+            });
+          });
+          items = items.slice(0, 30);
+          buildList();
+        }, 120);
+      }
     }
   }
 
@@ -515,12 +524,8 @@
       applyCustomPalette(items[idx].colors);
   }
 
-  var renderTimer = null;
   inp.addEventListener("input", function () {
-    clearTimeout(renderTimer);
-    renderTimer = setTimeout(function () {
-      render(inp.value);
-    }, 500);
+    render(inp.value);
   });
   inp.addEventListener("keydown", function (e) {
     if (e.key === "ArrowDown" || (e.ctrlKey && e.key === "n")) {
