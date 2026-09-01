@@ -27,15 +27,20 @@
           <h1 class="post-title">{{ .Title }}</h1>
           <div class="post-meta">
             {{- if .Date -}}
-              <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}"
+
+              <span class="post-date" title="Created on"
+                ><span class="nf" aria-hidden="true"> </span
+                ><span class="visually-hidden">Created on: </span
+                ><time datetime="{{ .Date.Format "2006-01-02" }}"
                 >{{ .Date.Format "2006-01-02" }}</time
+              ></span
               >
             {{- end -}}
             {{- if and .Lastmod (ne (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02")) -}}
-              <span class="post-date-updated"
-                ><span class="nf" aria-hidden="true"> </span>
-                updated on:
-                <time datetime="{{ .Lastmod.Format "2006-01-02" }}"
+              <span class="post-date-updated" title="Updated on"
+                ><span class="nf" aria-hidden="true">󰚰</span
+                ><span class="visually-hidden">Updated on: </span
+                ><time datetime="{{ .Lastmod.Format "2006-01-02" }}"
                   >{{ .Lastmod.Format "2006-01-02" }}</time
                 ></span
               >

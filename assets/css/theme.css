@@ -1178,6 +1178,7 @@
   .post-meta {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 1em;
     font-size: var(--fs-sm);
     color: var(--fg-dim);
@@ -1186,8 +1187,11 @@
     color: var(--yellow);
   }
   .post-date-updated {
-    color: var(--fg-dim);
-    font-size: var(--fs-inline);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    color: var(--yellow-faint);
+    cursor: help;
   }
   .post-reading-time {
     color: var(--cyan);
