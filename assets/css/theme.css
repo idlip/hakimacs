@@ -177,7 +177,8 @@
     --tracking-caps: 0.05em;
     --backdrop-dim: 30%;
     --backdrop-blur: 5px;
-    --chrome-bg-opacity: 88%;
+    --chrome-bg-opacity: 70%;
+    --dialog-transition: 0.45s;
 
     --fs-base: 1rem;
     --fs-sm: calc(var(--fs-base) * 0.9);
@@ -2136,15 +2137,44 @@
     max-height: 70vh;
     padding: 0;
     margin: 8vh auto 0;
+    /* Appear from above, not an instant pop. */
+    opacity: 0;
+    transform: translateY(-24px);
+    transition:
+      opacity var(--dialog-transition) ease,
+      transform var(--dialog-transition) ease,
+      overlay var(--dialog-transition) ease allow-discrete,
+      display var(--dialog-transition) ease allow-discrete;
     &[open] {
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @starting-style {
+      &[open] {
+        opacity: 0;
+        transform: translateY(-24px);
+      }
     }
     &::backdrop {
       background: color-mix(in oklch, black var(--backdrop-dim), transparent);
       backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
       -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+      opacity: 0;
+      transition:
+        opacity var(--dialog-transition) ease,
+        overlay var(--dialog-transition) ease allow-discrete,
+        display var(--dialog-transition) ease allow-discrete;
+    }
+    &[open]::backdrop {
+      opacity: 1;
+    }
+    @starting-style {
+      &[open]::backdrop {
+        opacity: 0;
+      }
     }
   }
 
@@ -2229,10 +2259,41 @@
     max-width: 92vw;
     max-height: 92vh;
     margin: auto;
+    /* Scale up from slightly smaller */
+    opacity: 0;
+    transform: scale(0.85);
+    transition:
+      opacity var(--dialog-transition) ease,
+      transform var(--dialog-transition) ease,
+      overlay var(--dialog-transition) ease allow-discrete,
+      display var(--dialog-transition) ease allow-discrete;
+    &[open] {
+      opacity: 1;
+      transform: scale(1);
+    }
+    @starting-style {
+      &[open] {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+    }
     &::backdrop {
       background: color-mix(in oklch, black var(--backdrop-dim), transparent);
       backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
       -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
+      opacity: 0;
+      transition:
+        opacity var(--dialog-transition) ease,
+        overlay var(--dialog-transition) ease allow-discrete,
+        display var(--dialog-transition) ease allow-discrete;
+    }
+    &[open]::backdrop {
+      opacity: 1;
+    }
+    @starting-style {
+      &[open]::backdrop {
+        opacity: 0;
+      }
     }
     & img {
       display: block;
