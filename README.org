@@ -587,3 +587,7 @@ Licensed under [[file:LICENSE-MIT][MIT]]. See [[file:LICENSE][LICENSE]] for a On
   Need nerd icon to be double spaced.
 
 - [ ] Make adding bottom stickers easier and make adding web ring easier
+
+- [X] Prettify internal links? Auto fill description for internal links to match title, so
+  dynamically when any title changes it reflects everywhere?
+  This needs ugly regex in code, but wonder how to handle override for specific.

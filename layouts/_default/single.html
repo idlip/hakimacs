@@ -76,9 +76,20 @@
         <div class="post-body">
           {{- /* go-org sets alt/title to the raw image path when there's no explicit
             :alt (#+attr_html: :alt "..."). */ -}}
-          {{ .Content |
+          {{- $postBody := .Content |
             replaceRE `(<img[^>]*\balt=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)` `${1}${3}${2}<figcaption>${3}` |
-            replaceRE `(<img[^>]*\btitle=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)` `${1}${3}${2}<figcaption>${3}` |
+            replaceRE `(<img[^>]*\btitle=")(?:/|https?://)[^"]*("[^>]*>)\s*<figcaption>([^<]*)` `${1}${3}${2}<figcaption>${3}`
+          -}}
+          {{- /* internal links always show the page title */ -}}
+          {{- if not .Site.Params.disableInternalLinkTitles -}}
+            {{- range findRESubmatch `<a href="(/[^"]+)">[^<]*</a>` $postBody -}}
+              {{- $match := index . 0 -}}{{- $href := index . 1 -}}
+              {{- with site.GetPage $href -}}
+                {{- $postBody = replace $postBody $match (printf "<a href=\"%s\">%s</a>" $href .Title) -}}
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+          {{ $postBody |
             replaceRE `<img ` `<img loading="lazy" decoding="async" ` |
             safeHTML
           }}

@@ -13,6 +13,8 @@
 }}
 */ -}}
 {{- $budget := .Site.Params.linkBudget | default 7 -}}
+{{- /* internal reference links auto show title */ -}}
+{{- $autoTitles := not .Site.Params.disableInternalLinkTitles -}}
 
 {{- /* 1. Collect references from post content. */ -}}
 {{- $matches := findRESubmatch `(?s)<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>` .Content -}}
@@ -65,14 +67,18 @@
       {{- range . }}
         {{- if .internal }}
           {{- $pg := site.GetPage .href -}}
+          {{- $label := .text -}}
+          {{- if and $pg $autoTitles -}}
+            {{- $label = $pg.Title -}}
+          {{- else if not $label -}}
+            {{- if $pg -}}
+              {{- $label = $pg.Title -}}
+            {{- else -}}
+              {{- $label = $.Site.Title -}}
+            {{- end -}}
+          {{- end -}}
           <li>
-            <a href="{{ .href }}"
-              >{{ with .text }}
-                {{ . }}
-              {{ else }}
-                {{ with $pg }}{{ .Title }}{{ else }}{{ $.Site.Title }}{{ end }}
-              {{ end }}</a
-            >
+            <a href="{{ .href }}">{{ $label }}</a>
           </li>
         {{- else }}
           {{- $domain := .href | replaceRE `^https?://(www\.)?` "" | replaceRE `/.*$` "" -}}
