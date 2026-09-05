@@ -1,0 +1,8 @@
+{{- /* used in override footer-text if required */ -}}
+{{- partial "badge.html" (dict
+  "logo" (.Get "logo")
+  "name" (.Get "name")
+  "color" (.Get "color")
+  "link" (.Get "link")
+  "subtitle" (.Get "subtitle")
+) -}}

@@ -1,0 +1,18 @@
+{{- /* render simple badge with logo and text with link */ -}}
+<a href="{{ .link | default "#" }}" class="badge">
+  <span class="badge-icon">
+    <img src="{{ .logo }}" alt="{{ .name | default "" }}" loading="lazy" />
+  </span>
+  {{- with .subtitle }}
+    <span class="badge-subtitle">{{ . }}</span>
+  {{- end }}
+  {{- with .name }}
+    <span
+      class="badge-name"
+      {{- with $.color }}
+        style="background:{{ . }}"
+      {{- end }}
+      >{{ . }}</span
+    >
+  {{- end }}
+</a>
