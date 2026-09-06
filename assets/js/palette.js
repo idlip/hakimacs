@@ -334,9 +334,7 @@
               it.html +
               "</span>" +
               (it.snippet
-                ? '<span class="palette-item-snippet">' +
-                  it.snippet +
-                  "</span>"
+                ? '<span class="palette-item-snippet">' + it.snippet + "</span>"
                 : "") +
               "</span></div>"
             );
@@ -499,8 +497,7 @@
               html: esc(r.title),
               snippet: highlightWords(r.snippet, words),
               action: function () {
-                location.href =
-                  r.url + "#:~:text=" + encodeURIComponent(r.hit);
+                location.href = r.url + "#:~:text=" + encodeURIComponent(r.hit);
               },
               type: "post",
             });

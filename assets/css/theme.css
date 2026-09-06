@@ -1720,7 +1720,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    background: color-mix(in oklch, var(--menu-bg) var(--chrome-bg-opacity), transparent);
+    background: color-mix(
+      in oklch,
+      var(--menu-bg) var(--chrome-bg-opacity),
+      transparent
+    );
     backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     border-bottom: 1px solid var(--menu-border);
@@ -1978,7 +1982,11 @@
     padding: 0.8em 1.5em 0.8em 0.4em;
     /* iOS home indicator: keep the bar above the safe-area inset. */
     padding-bottom: max(0.8em, env(safe-area-inset-bottom, 0));
-    background-color: color-mix(in oklch, var(--bg-dim) var(--chrome-bg-opacity), transparent);
+    background-color: color-mix(
+      in oklch,
+      var(--bg-dim) var(--chrome-bg-opacity),
+      transparent
+    );
     backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     -webkit-backdrop-filter: blur(var(--backdrop-blur)) saturate(160%);
     color: var(--modeline-fg);
