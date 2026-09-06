@@ -1,0 +1,6 @@
+{{- /* generic ascii-rain hover easter egg; params: text (required), href (optional -> renders a link) */ -}}
+{{- if .href }}
+  <a class="rain-hover" href="{{ .href }}">{{ .text }}{{ partial "rain-spans.html" . }}</a>
+{{- else }}
+  <span class="rain-hover">{{ .text }}{{ partial "rain-spans.html" . }}</span>
+{{- end }}

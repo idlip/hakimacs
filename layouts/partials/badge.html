@@ -1,5 +1,6 @@
 {{- /* render simple badge with logo and text with link */ -}}
-<a href="{{ .link | default "#" }}" class="badge"
+{{- $tooltip := .tooltip | default (print .subtitle " " .name) -}}
+<a href="{{ .link | default "#" }}" class="badge rain-hover" title="{{ $tooltip }}"
   {{- with $.color }}
         style="border:1px solid {{ . }}"
   {{- end }}
@@ -19,4 +20,5 @@
       >{{ . }}</span
     >
   {{- end }}
+  {{ partial "rain-spans.html" . }}
 </a>

@@ -1,0 +1,5 @@
+{{- /* ascii rain hover easter egg, usable anywhere in org content; usage: {{< rain text="Get lost" href="/wander/" >}} */ -}}
+{{- partial "rain-hover.html" (dict
+  "text" (.Get "text")
+  "href" (.Get "href")
+) -}}
