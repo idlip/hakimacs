@@ -42,8 +42,18 @@
   {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
 {{ end -}}
 
-{{- /* Favicon */ -}}
-<link rel="icon" type="image/png" href="{{ .Site.Params.favicon | relURL }}" />
+{{- /* Favicon. MIME type derived from the file extension so swapping
+  params.favicon between a .jpg/.png/.svg/.webp never leaves a stale type behind. */ -}}
+{{- $faviconExt := path.Ext .Site.Params.favicon -}}
+{{- $faviconType := "image/jpeg" -}}
+{{- if eq $faviconExt ".png" -}}
+  {{- $faviconType = "image/png" -}}
+{{- else if eq $faviconExt ".svg" -}}
+  {{- $faviconType = "image/svg+xml" -}}
+{{- else if eq $faviconExt ".webp" -}}
+  {{- $faviconType = "image/webp" -}}
+{{- end -}}
+<link rel="icon" type="{{ $faviconType }}" href="{{ .Site.Params.favicon | relURL }}" />
 
 {{- /* Open Graph / Twitter */ -}}
 <meta
