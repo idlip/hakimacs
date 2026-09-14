@@ -5,11 +5,13 @@
   </button>
 
   <nav class="menu-items" role="menubar" aria-label="Site navigation">
-    {{- /* Buffers Menu — driven by menu.main in config.yaml */ -}}
-    <div class="menu-item" role="none">
-      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+    {{- /* Buffers Menu — driven by menu.main in config.yaml. <details name="menu">
+      makes the four top-level menus a native exclusive group: opening one
+      closes the others with no JS, and click-to-toggle is free. */ -}}
+    <details class="menu-item" name="menu" role="none">
+      <summary role="menuitem" aria-haspopup="true" aria-expanded="false">
         <span class="underline">B</span>uffers
-      </button>
+      </summary>
       <div class="menu-dropdown" role="menu">
         {{- range .Site.Menus.main }}
           <a
@@ -40,13 +42,13 @@
           </a>
         {{- end }}
       </div>
-    </div>
+    </details>
 
     {{- /* View Menu */ -}}
-    <div class="menu-item" role="none">
-      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+    <details class="menu-item" name="menu" role="none">
+      <summary role="menuitem" aria-haspopup="true" aria-expanded="false">
         <span class="underline">V</span>iew
-      </button>
+      </summary>
       <div class="menu-dropdown" role="menu">
         <button
           class="menu-dropdown-item"
@@ -54,7 +56,6 @@
           data-action="toggle-theme"
         >
           <span>Toggle Dark/Light</span>
-          <span class="menu-shortcut">t</span>
         </button>
         <div class="menu-separator" role="separator"></div>
         {{- if .Site.Params.colorSchemes }}
@@ -69,40 +70,15 @@
               <span>{{ .label }}</span>
             </button>
           {{- end }}
-          <div class="menu-separator" role="separator"></div>
         {{- end }}
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="increase-font"
-        >
-          <span>Increase Font Size</span>
-          <span class="menu-shortcut">+</span>
-        </button>
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="decrease-font"
-        >
-          <span>Decrease Font Size</span>
-          <span class="menu-shortcut">-</span>
-        </button>
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="reset-font"
-        >
-          <span>Reset Font Size</span>
-          <span class="menu-shortcut">0</span>
-        </button>
       </div>
-    </div>
+    </details>
 
     {{- /* Help Menu */ -}}
-    <div class="menu-item" role="none">
-      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+    <details class="menu-item" name="menu" role="none">
+      <summary role="menuitem" aria-haspopup="true" aria-expanded="false">
         <span class="underline">H</span>elp
-      </button>
+      </summary>
       <div class="menu-dropdown" role="menu">
         <button
           class="menu-dropdown-item"
@@ -110,7 +86,6 @@
           data-action="show-help"
         >
           <span>Keyboard Shortcuts</span>
-          <span class="menu-shortcut">?</span>
         </button>
         <div class="menu-separator" role="separator"></div>
         <a
@@ -139,13 +114,13 @@
           {{- end }}
         {{- end }}
       </div>
-    </div>
+    </details>
 
     {{- /* M-x Command Menu — all JS-callable actions */ -}}
-    <div class="menu-item" role="none">
-      <button role="menuitem" aria-haspopup="true" aria-expanded="false">
+    <details class="menu-item" name="menu" role="none">
+      <summary role="menuitem" aria-haspopup="true" aria-expanded="false">
         <span class="underline">M</span>-x
-      </button>
+      </summary>
       <div class="menu-dropdown" role="menu">
         <button
           class="menu-dropdown-item"
@@ -162,7 +137,6 @@
           data-action="toggle-theme"
         >
           <span>Toggle Dark/Light</span>
-          <span class="menu-shortcut">t</span>
         </button>
         <button
           class="menu-dropdown-item"
@@ -170,7 +144,6 @@
           data-action="cycle-font"
         >
           <span>Cycle Font Mode</span>
-          <span class="menu-shortcut">f</span>
         </button>
         <button
           class="menu-dropdown-item"
@@ -178,15 +151,6 @@
           data-action="cycle-width"
         >
           <span>Cycle Content Width</span>
-          <span class="menu-shortcut">w</span>
-        </button>
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="cycle-align"
-        >
-          <span>Cycle Text Alignment</span>
-          <span class="menu-shortcut">a</span>
         </button>
         <button
           class="menu-dropdown-item"
@@ -194,32 +158,6 @@
           data-action="browse-schemes"
         >
           <span>Browse All Schemes</span>
-          <span class="menu-shortcut">t[sp]</span>
-        </button>
-        <div class="menu-separator" role="separator"></div>
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="increase-font"
-        >
-          <span>Increase Font Size</span>
-          <span class="menu-shortcut">+</span>
-        </button>
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="decrease-font"
-        >
-          <span>Decrease Font Size</span>
-          <span class="menu-shortcut">-</span>
-        </button>
-        <button
-          class="menu-dropdown-item"
-          role="menuitem"
-          data-action="reset-font"
-        >
-          <span>Reset Font Size</span>
-          <span class="menu-shortcut">0</span>
         </button>
         <div class="menu-separator" role="separator"></div>
         {{- /* menuitemcheckbox, not menuitem: this is a toggle, and aria-pressed is not valid on a menuitem. */ -}}
@@ -238,17 +176,16 @@
           data-action="show-help"
         >
           <span>Keyboard Shortcuts</span>
-          <span class="menu-shortcut">?</span>
         </button>
         <button
           class="menu-dropdown-item"
           role="menuitem"
           data-action="toggle-keys"
         >
-          <span>Enable / disable shortcuts</span>
+          <span>Enable / disable "x" shortcut</span>
         </button>
       </div>
-    </div>
+    </details>
   </nav>
 
   <div class="menu-bar-right">
@@ -282,36 +219,25 @@
     <button
       class="menu-bar-btn"
       id="ml-width-btn"
-      title="Cycle content width [100% → 80ch → 60ch → 840px] (w)"
+      title="Cycle content width [100% → 80ch → 60ch → 840px]"
       aria-label="Cycle content width"
       data-action="cycle-width"
     >
       <span class="nf" aria-hidden="true">󰭣 </span>
     </button>
 
-    {{- /* Alignment cycle button (normal → justified → columns). Placeholder glyph. */ -}}
-    <button
-      class="menu-bar-btn"
-      title="Cycle text alignment [normal → justified → columns] (a)"
-      aria-label="Cycle text alignment"
-      data-action="cycle-align"
-    >
-      <span class="nf" aria-hidden="true">󰉢 </span>
-    </button>
-
-    {{- /* Scheme popup */ -}}
     {{- if .Site.Params.colorSchemes }}
-      <div class="scheme-popup-container" id="scheme-popup-container">
-        <button
+      <details class="scheme-popup-container" id="scheme-popup-container">
+        <summary
           class="menu-bar-btn scheme-popup-btn"
           id="scheme-popup-btn"
-          aria-label="Color scheme (c)"
-          title="Color scheme (c)"
+          aria-label="Color scheme"
+          title="Color scheme"
           aria-expanded="false"
           aria-haspopup="true"
         >
-          <span class="nf" aria-hidden="true"> </span>
-        </button>
+          <span class="nf" aria-hidden="true"></span>
+        </summary>
         <div
           class="scheme-popup"
           id="scheme-popup"
@@ -343,7 +269,7 @@
             </button>
           </div>
         </div>
-      </div>
+      </details>
     {{- end }}
 
     {{- /* Theme toggle */ -}}
@@ -351,7 +277,7 @@
       class="menu-bar-btn"
       aria-label="Toggle dark/light"
       data-action="toggle-theme"
-      title="Toggle dark/light (t)"
+      title="Toggle dark/light"
     >
       <span class="nf theme-icon-dark" aria-hidden="true"></span>
       <span class="nf theme-icon-light" aria-hidden="true"> </span>

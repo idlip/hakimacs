@@ -102,30 +102,17 @@
         {{- if not .Params.no_comment }}{{ partial "comment.html" . }}{{ end -}}
 
         {{- /* Post navigation */ -}}
-        <nav
-          class="post-navigation"
-          style="margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--border-dim);"
-        >
-          <div
-            style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1em;"
-          >
+        <nav class="post-navigation">
+          <div>
             {{- with .PrevInSection }}
-              <a
-                id="post-prev"
-                href="{{ .RelPermalink }}"
-                style="color: var(--link);"
-              >
+              <a id="post-prev" href="{{ .RelPermalink }}">
                 &larr;
                 {{ .Title | truncate 40 }}
               </a>
             {{- end }}
-            <span style="flex: 1;"></span>
+            <span></span>
             {{- with .NextInSection }}
-              <a
-                id="post-next"
-                href="{{ .RelPermalink }}"
-                style="color: var(--link);"
-              >
+              <a id="post-next" href="{{ .RelPermalink }}">
                 {{ .Title | truncate 40 }} &rarr;
               </a>
             {{- end }}

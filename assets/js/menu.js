@@ -6,9 +6,6 @@
   "use strict";
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let openMenu = null;
-  let fontSize = 100;
-  let schemePopupOpen = false;
   let previewScheme = null; // scheme being hovered (for live preview)
 
   // ── DOM ───────────────────────────────────────────────────────────────────
@@ -18,6 +15,9 @@
   const backdrop = document.getElementById("menu-backdrop");
   const schemePopupBtn = document.getElementById("scheme-popup-btn");
   const schemePopup = document.getElementById("scheme-popup");
+  const schemePopupContainer = document.getElementById(
+    "scheme-popup-container",
+  );
 
   // ── Theme ─────────────────────────────────────────────────────────────────
 
@@ -168,29 +168,29 @@
   }
 
   // ── Scheme Popup ──────────────────────────────────────────────────────────
+  // A <details>; open/closed is native. toggleSchemePopup stays around only
+  // because palette.js's "Color scheme picker" command calls it by name.
 
-  function openSchemePopup() {
-    schemePopup?.classList.add("open");
-    schemePopupBtn?.setAttribute("aria-expanded", "true");
-    schemePopupOpen = true;
+  function toggleSchemePopup() {
+    if (schemePopupContainer) schemePopupContainer.open = !schemePopupContainer.open;
   }
 
-  function closeSchemePopup() {
-    schemePopup?.classList.remove("open");
-    schemePopupBtn?.setAttribute("aria-expanded", "false");
-    // Restore scheme if we're mid-hover-preview
-    if (previewScheme !== null) {
+  // Fires on every open/close of the popup, however it happened (click,
+  // Escape via handleKeydown below, or the toggle above) — so a live preview
+  // never survives closing it, the same class of fix as palette.js's own
+  // dialog "close" listener.
+  schemePopupContainer?.addEventListener("toggle", () => {
+    schemePopupBtn?.setAttribute(
+      "aria-expanded",
+      String(schemePopupContainer.open),
+    );
+    if (!schemePopupContainer.open && previewScheme !== null) {
       previewScheme
         ? document.documentElement.setAttribute("data-scheme", previewScheme)
         : document.documentElement.removeAttribute("data-scheme");
       previewScheme = null;
     }
-    schemePopupOpen = false;
-  }
-
-  function toggleSchemePopup() {
-    schemePopupOpen ? closeSchemePopup() : openSchemePopup();
-  }
+  });
 
   // ── Font Mode Cycling ─────────────────────────────────────────────────────
   // Mono → Sans → Serif → Mixed (prose serif, structure/meta sans, code mono)
@@ -219,61 +219,6 @@
     const mode = saved && FONT_STEPS.includes(saved) ? saved : FONT_DEFAULT;
     fontIdx = FONT_STEPS.indexOf(mode);
     document.documentElement.setAttribute("data-font", mode);
-  }
-
-  // ── Text Alignment Cycling ────────────────────────────────────────────────
-  // Normal (left) -> Justified -> Columns. First-line indent is always on (CSS).
-  // Normal is the default and matches the CSS base, so index 0 is the resting
-  // state and the attribute only appears once the user actually cycles.
-  const ALIGN_STEPS = ["normal", "justify", "columns"];
-  const ALIGN_LABELS = {
-    justify: "Justified",
-    normal: "Normal",
-    columns: "Columns",
-  };
-  let alignIdx = 0;
-
-  function cycleAlign() {
-    alignIdx = (alignIdx + 1) % ALIGN_STEPS.length;
-    const a = ALIGN_STEPS[alignIdx];
-    document.documentElement.setAttribute("data-align", a);
-    localStorage.setItem("emacs-align", a);
-    showMsg("Align: " + ALIGN_LABELS[a]);
-  }
-
-  function restoreAlign() {
-    const saved = localStorage.getItem("emacs-align");
-    if (saved && ALIGN_STEPS.includes(saved)) {
-      alignIdx = ALIGN_STEPS.indexOf(saved);
-      document.documentElement.setAttribute("data-align", saved);
-    }
-  }
-
-  // ── Font Size ─────────────────────────────────────────────────────────────
-
-  function adjustFontSize(delta) {
-    fontSize = Math.max(80, Math.min(150, fontSize + delta * 10));
-    document.documentElement.style.fontSize = fontSize + "%";
-    localStorage.setItem("emacs-font-size", fontSize);
-    showMsg("Font size: " + fontSize + "%");
-  }
-
-  function resetFontSize() {
-    fontSize = 100;
-    document.documentElement.style.fontSize = "100%";
-    localStorage.removeItem("emacs-font-size");
-    showMsg("Font size reset");
-  }
-
-  function restoreFontSize() {
-    const saved = localStorage.getItem("emacs-font-size");
-    if (saved) {
-      const n = parseInt(saved, 10);
-      if (!isNaN(n) && n >= 80 && n <= 150) {
-        fontSize = n;
-        document.documentElement.style.fontSize = n + "%";
-      }
-    }
   }
 
   // ── Content Width Cycle ───────────────────────────────────────────────────
@@ -310,35 +255,10 @@
     window.emacsBlog?.keyboard?.showMessage?.(msg);
   }
 
-  // ── Backdrop ──────────────────────────────────────────────────────────────
-
-  function showBackdrop() {
-    backdrop?.classList.add("visible");
-  }
-  function hideBackdrop() {
-    backdrop?.classList.remove("visible");
-  }
-
-  // ── Menu Dropdowns ────────────────────────────────────────────────────────
-
-  function openMenuDropdown(item) {
-    closeAllMenus();
-    item.classList.add("open");
-    item
-      .querySelector(":scope > button")
-      ?.setAttribute("aria-expanded", "true");
-    openMenu = item;
-  }
-
-  function closeAllMenus() {
-    menuItems.forEach((item) => {
-      item.classList.remove("open");
-      item
-        .querySelector(":scope > button")
-        ?.setAttribute("aria-expanded", "false");
-    });
-    openMenu = null;
-  }
+  // ── Mobile hamburger menu ─────────────────────────────────────────────────
+  // Unlike the dropdowns/scheme popup above, this toggles the same .menu-items
+  // nav in and out of a mobile-only overlay layout rather than showing a
+  // hidden-by-default element, so it stays a plain class toggle.
 
   function toggleMobileMenu() {
     const isOpen = menuBar?.classList.toggle("menu-open");
@@ -350,17 +270,9 @@
     hamburger?.setAttribute("aria-expanded", "false");
   }
 
-  function handleMenuClick(e) {
-    const item = e.target.closest(".menu-item");
-    if (!item) return;
-    const btn = e.target.closest("button");
-    if (btn && btn.parentElement === item) {
-      item.classList.contains("open")
-        ? closeAllMenus()
-        : openMenuDropdown(item);
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  function handleBackdropClick() {
+    closeMobileMenu();
+    backdrop?.classList.remove("visible");
   }
 
   function handleActionClick(e) {
@@ -371,23 +283,11 @@
       case "toggle-theme":
         toggleTheme();
         break;
-      case "increase-font":
-        adjustFontSize(1);
-        break;
-      case "decrease-font":
-        adjustFontSize(-1);
-        break;
-      case "reset-font":
-        resetFontSize();
-        break;
       case "cycle-width":
         cycleWidth();
         break;
       case "cycle-font":
         cycleFontMode();
-        break;
-      case "cycle-align":
-        cycleAlign();
         break;
       case "toggle-keys":
         window.toggleKeys && window.toggleKeys();
@@ -405,16 +305,16 @@
         window.emacsBlog?.palette?.open("? ");
         break;
     }
-    closeAllMenus();
+    document.querySelectorAll(".menu-item[open]").forEach((d) => (d.open = false));
     if (
       action !== "cycle-width" &&
       action !== "cycle-font" &&
-      action !== "cycle-align" &&
       action !== "fix-scheme" &&
       action !== "open-palette" &&
-      action !== "browse-schemes"
+      action !== "browse-schemes" &&
+      schemePopupContainer
     )
-      closeSchemePopup();
+      schemePopupContainer.open = false;
   }
 
   function handleSchemeOptionClick(e) {
@@ -426,35 +326,32 @@
     if (localStorage.getItem("emacs-scheme-fixed") !== null) {
       localStorage.setItem("emacs-scheme-fixed", el.dataset.scheme || "");
     }
-    previewScheme = null; // commit — prevent closeSchemePopup from restoring old scheme
-    closeAllMenus();
-    closeSchemePopup();
+    previewScheme = null; // commit — nothing left to restore when it closes
+    document.querySelectorAll(".menu-item[open]").forEach((d) => (d.open = false));
+    if (schemePopupContainer) schemePopupContainer.open = false;
   }
 
   function handleOutsideClick(e) {
-    if (openMenu && !e.target.closest(".menu-item")) closeAllMenus();
-    if (schemePopupOpen && !e.target.closest("#scheme-popup-container"))
-      closeSchemePopup();
-  }
-
-  function handleBackdropClick() {
-    closeMobileMenu();
-    closeAllMenus();
-    hideBackdrop();
+    if (!e.target.closest(".menu-item")) {
+      document.querySelectorAll(".menu-item[open]").forEach((d) => (d.open = false));
+    }
+    if (
+      schemePopupContainer?.open &&
+      !e.target.closest("#scheme-popup-container")
+    )
+      schemePopupContainer.open = false;
   }
 
   function handleKeydown(e) {
     if (e.key === "Escape") {
-      closeAllMenus();
-      closeSchemePopup();
+      document.querySelectorAll(".menu-item[open]").forEach((d) => (d.open = false));
+      if (schemePopupContainer) schemePopupContainer.open = false;
       closeMobileMenu();
     }
-    if (!openMenu) return;
-    const dropdown = openMenu.querySelector(".menu-dropdown");
-    const items = dropdown?.querySelectorAll(
-      ".menu-dropdown-item:not(.disabled)",
-    );
-    if (!items?.length) return;
+    const dropdown = document.querySelector(".menu-item[open] > .menu-dropdown");
+    if (!dropdown) return;
+    const items = dropdown.querySelectorAll(".menu-dropdown-item:not(.disabled)");
+    if (!items.length) return;
     const focused = dropdown.querySelector(".menu-dropdown-item:focus");
     let idx = focused ? Array.from(items).indexOf(focused) : -1;
     if (e.key === "ArrowDown") {
@@ -474,11 +371,6 @@
   // ── Init ──────────────────────────────────────────────────────────────────
 
   function init() {
-    // Menu dropdowns
-    menuItems.forEach((item) =>
-      item.addEventListener("click", handleMenuClick),
-    );
-
     // Scheme options (both in View menu and popup)
     document.querySelectorAll(".scheme-option").forEach((opt) => {
       opt.addEventListener("click", handleSchemeOptionClick);
@@ -494,36 +386,31 @@
       }
     });
 
-    // Scheme popup toggle
-    schemePopupBtn?.addEventListener("click", (e) => {
-      toggleSchemePopup();
-      e.stopPropagation();
-    });
-
     // Backdrop
     backdrop?.addEventListener("click", handleBackdropClick);
 
     // Hamburger
     hamburger?.addEventListener("click", toggleMobileMenu);
 
-    // Outside click
+    // Outside click (dropdowns/scheme popup have native open-toggle, but not
+    // native light-dismiss the way a popover would — this is that piece)
     document.addEventListener("click", handleOutsideClick);
 
-    // Keyboard
+    // Keyboard: Escape closes everything; arrow keys/Enter roam an open menu
     document.addEventListener("keydown", handleKeydown);
 
-    // Hover to open adjacent menu (desktop UX)
+    // Hover to switch to an adjacent menu while one is already open (desktop
+    // UX). name="menu" grouping means opening one natively closes the rest.
     menuItems.forEach((item) => {
       item.addEventListener("mouseenter", () => {
-        if (openMenu && openMenu !== item) openMenuDropdown(item);
+        if (document.querySelector(".menu-item[open]") && !item.open)
+          item.open = true;
       });
     });
 
     // Restore saved state
-    restoreFontSize();
     restoreWidth();
     restoreFontMode();
-    restoreAlign();
 
     // Random/pinned scheme
     initRandomScheme();
@@ -538,27 +425,15 @@
     init();
   }
 
-  // Expose globals for keyboard.js shortcuts
+  // Expose globals for palette.js commands
   window.toggleTheme = toggleTheme;
-  window.adjustFontSize = adjustFontSize;
-  window.resetFontSize = resetFontSize;
   window.cycleWidth = cycleWidth;
   window.cycleFontMode = cycleFontMode;
-  window.cycleAlign = cycleAlign;
   window.toggleSchemePopup = toggleSchemePopup;
-  window.applyScheme = applyScheme;
   window.pinScheme = fixScheme;
 
   window.emacsBlog = window.emacsBlog || {};
   window.emacsBlog.menu = {
-    toggleTheme,
-    adjustFontSize,
-    resetFontSize,
-    closeAllMenus,
-    applyScheme,
-    cycleWidth,
-    cycleFontMode,
-    cycleAlign,
     refreshPinState: function () {
       updatePinLabel(isPinned());
     },

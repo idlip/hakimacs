@@ -31,16 +31,19 @@
           <span id="topic-count" class="list-search-count"
             >{{ len $all }} schemes</span
           >
-          <button
+          {{- /* List / grid view toggle: a real checkbox, same as
+            topic-list.html — grid layout is pure CSS
+            (:has(#view-toggle:checked)); JS only persists the choice. */ -}}
+          <input
+            type="checkbox"
             id="view-toggle"
-            class="tag-cloud-btn"
-            type="button"
+            class="view-toggle-input"
             aria-label="Toggle list / grid view"
-            aria-pressed="false"
             title="Toggle list / grid view"
-          >
+          />
+          <label for="view-toggle" class="tag-cloud-btn">
             <span class="nf" aria-hidden="true">󰕰 </span>
-          </button>
+          </label>
         </div>
 
         <ul class="article-list" id="article-list" role="list">

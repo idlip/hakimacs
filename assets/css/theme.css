@@ -551,7 +551,7 @@
     clip: rect(0, 0, 0, 0);
     border: 0;
   }
-  :is(button, a, [tabindex]):focus-visible {
+  :is(button, a, summary, [tabindex]):focus-visible {
     outline: 2px solid var(--blue);
     outline-offset: 2px;
   }
@@ -1304,6 +1304,30 @@
   }
 
   /* ── References / citations ── */
+  .post-navigation {
+    margin-top: 3em;
+    padding-top: 1em;
+    border-top: 1px solid var(--border-dim);
+    & > div {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1em;
+      /* The lone spacer <span> between prev/next; grows to push a single
+         link to its own side rather than both sitting flush left. */
+      & > span {
+        flex: 1;
+      }
+    }
+    & a {
+      color: var(--link);
+      text-decoration: none;
+    }
+    & a:is(:hover, :focus-visible) {
+      color: var(--link-hover);
+    }
+  }
+
   .references {
     margin-top: 3em;
     padding-top: 1em;
@@ -1391,6 +1415,28 @@
       border-color: var(--cursor);
       background: var(--bg-hl-line);
       color: var(--cursor);
+    }
+  }
+  /* view-toggle is a real checkbox styled as a .tag-cloud-btn (see markup);
+     the label picks up the active look straight off :checked, no JS class. */
+  .view-toggle-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    &:checked + .tag-cloud-btn {
+      border-color: var(--cursor);
+      background: var(--bg-hl-line);
+      color: var(--cursor);
+    }
+    &:focus-visible + .tag-cloud-btn {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
     }
   }
   .tag-cloud-count {
@@ -1574,29 +1620,31 @@
     color: var(--cyan-cooler);
   }
 
-  /* Topic pages: grid / card view (toggled by #view-toggle, persisted in JS). */
-  .article-list.is-grid {
+  /* Topic pages: grid / card view. Native checkbox + :has(), no JS to show it —
+     #view-toggle's checked state is read straight off the DOM; a tiny JS shim
+     (topic-list-js.html) only persists the choice across page loads. */
+  #article-content:has(#view-toggle:checked) .article-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
     gap: 0.6em;
     padding: var(--space);
   }
-  .article-list.is-grid .year-divider {
+  #article-content:has(#view-toggle:checked) .article-list .year-divider {
     grid-column: 1 / -1;
   }
-  .article-list.is-grid .topic-item {
+  #article-content:has(#view-toggle:checked) .article-list .topic-item {
     padding: 0.6em 0.8em;
   }
-  .article-list.is-grid .topic-item:hover {
+  #article-content:has(#view-toggle:checked) .article-list .topic-item:hover {
     border-color: var(--border-highlight);
     background: var(--bg-active);
   }
 
-  /* ── /themes gallery — scheme cards (extends .topic-item / .article-list.is-grid) ── */
+  /* ── /themes gallery — scheme cards (extends .topic-item / grid view) ── */
   .scheme-card {
     display: block;
   }
-  .article-list.is-grid .scheme-card {
+  #article-content:has(#view-toggle:checked) .article-list .scheme-card {
     content-visibility: auto;
     contain-intrinsic-size: 0 130px;
   }
@@ -1754,27 +1802,33 @@
     flex-wrap: nowrap;
   }
 
+  /* Menus are <details>: open/closed and one-at-a-time (name="menu") are
+     native, no JS. Positioning stays exactly the old absolute-under-a-
+     relative-ancestor trick — <details> content is normal flow, unlike a
+     popover, so nothing here needed to change for that. */
   .menu-item {
     position: relative;
     display: inline-block;
-    & > button {
+    & > summary {
       display: flex;
       align-items: center;
       padding: 0.4em 0.8em;
       color: var(--menu-fg);
+      cursor: pointer;
+      list-style: none;
       transition: background-color var(--transition);
+      &::-webkit-details-marker {
+        display: none;
+      }
       & .underline {
         text-decoration: underline;
       }
     }
-    & > button:is(:hover, :focus-visible) {
+    & > summary:is(:hover, :focus-visible) {
       background: var(--menu-hover-bg);
     }
-    &.open > button {
+    &[open] > summary {
       background: var(--menu-active-bg);
-    }
-    &.open .menu-dropdown {
-      display: block;
     }
   }
 
@@ -1786,7 +1840,6 @@
     background: var(--menu-bg);
     border: 1px solid var(--menu-border);
     box-shadow: 2px 2px 8px color-mix(in oklch, black 30%, transparent);
-    display: none;
     z-index: 1000;
   }
   .menu-dropdown-item {
@@ -1893,6 +1946,14 @@
       border-color var(--transition);
     margin-left: 0.3em;
   }
+  /* .scheme-popup-btn is a <summary> — same marker removal as .menu-item's. */
+  .scheme-popup-btn {
+    cursor: pointer;
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
   :is(.menu-bar-btn, .scheme-popup-btn):is(
     :hover,
     :focus-visible,
@@ -1911,12 +1972,8 @@
     background: var(--menu-bg);
     border: 1px solid var(--menu-border);
     box-shadow: 2px 4px 12px color-mix(in oklch, black 40%, transparent);
-    display: none;
     z-index: 1001;
     overflow: hidden;
-    &.open {
-      display: block;
-    }
   }
 
   /* Backdrop */

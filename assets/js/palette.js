@@ -1,7 +1,7 @@
 /**
  * Command Palette — native <dialog>.
  * Default: commands + posts. "t " prefix: all base16 schemes.
- * Trigger: x key (keyboard.js) or window.emacsBlog.palette.open()
+ * Trigger: x / Ctrl-K / Ctrl-S / Alt-X (keyboard.js) or window.emacsBlog.palette.open()
  */
 (function () {
   "use strict";
@@ -99,38 +99,6 @@
       },
     },
     {
-      t: "Cycle text alignment",
-      type: "command",
-      a: function () {
-        dlg.close();
-        window.cycleAlign && window.cycleAlign();
-      },
-    },
-    {
-      t: "Increase font size",
-      type: "command",
-      a: function () {
-        dlg.close();
-        window.adjustFontSize && window.adjustFontSize(1);
-      },
-    },
-    {
-      t: "Decrease font size",
-      type: "command",
-      a: function () {
-        dlg.close();
-        window.adjustFontSize && window.adjustFontSize(-1);
-      },
-    },
-    {
-      t: "Reset font size",
-      type: "command",
-      a: function () {
-        dlg.close();
-        window.resetFontSize && window.resetFontSize();
-      },
-    },
-    {
       t: "Pin / unpin scheme",
       type: "command",
       a: function () {
@@ -187,71 +155,10 @@
   ]);
 
   var HELP = [
-    { t: "n / ↓  —  Next article", a: null },
-    { t: "p / ↑  —  Previous article", a: null },
-    { t: "RET / o  —  Open article", a: null },
-    { t: "< / >  —  First / last in list", a: null },
-    { t: "n / p  —  Next / prev post", a: null },
-    { t: "Space  —  Scroll page", a: null },
-    { t: "q  —  Go back to list", a: null },
     {
-      t: "g h  —  Go home",
-      a: function () {
-        location.href = "/";
-      },
+      t: "Ctrl/Cmd-K, Ctrl/Cmd-S, Alt-X (M-x), or x  —  Open command palette",
+      a: null,
     },
-    {
-      t: "g p  —  Go to posts",
-      a: function () {
-        location.href = "/posts/";
-      },
-    },
-    { t: "g g / g G  —  Top / bottom", a: null },
-    {
-      t: "t  —  Toggle theme",
-      a: function () {
-        dlg.close();
-        window.toggleTheme && window.toggleTheme();
-      },
-    },
-    {
-      t: "f  —  Cycle font mode",
-      a: function () {
-        dlg.close();
-        window.cycleFontMode && window.cycleFontMode();
-      },
-    },
-    {
-      t: "w  —  Cycle content width",
-      a: function () {
-        dlg.close();
-        window.cycleWidth && window.cycleWidth();
-      },
-    },
-    {
-      t: "a  —  Cycle text alignment",
-      a: function () {
-        dlg.close();
-        window.cycleAlign && window.cycleAlign();
-      },
-    },
-    {
-      t: "c  —  Color scheme picker",
-      a: function () {
-        dlg.close();
-        window.toggleSchemePopup && window.toggleSchemePopup();
-      },
-    },
-    {
-      t: "Pin scheme  —  keep this one every load",
-      a: function () {
-        dlg.close();
-        window.pinScheme && window.pinScheme();
-      },
-    },
-    { t: "(unpinned = new random scheme each reload)", a: null },
-    { t: "+ / -  —  Font size", a: null },
-    { t: "x  —  Open command palette", a: null },
   ];
 
   var idx = 0,
@@ -441,7 +348,7 @@
       buildList();
     } else {
       inp.placeholder =
-        "Search posts, run commands, browse themes  (M-x \u00b7 Ctrl-P \u00b7 Ctrl-K)\u2026";
+        "Search posts, run commands, browse themes  (M-x \u00b7 Ctrl-K \u00b7 Ctrl-S)\u2026";
       var q = v.trim();
       items = [];
       var seenUrls = {};
@@ -482,9 +389,12 @@
       items = items.slice(0, 30);
       buildList();
 
-      // debounce index search
+      // debounce index search. A short query still triggers it once a space
+      // shows up (typed a whole word, or moved on to a second one) rather
+      // than waiting for 5+ characters — "nix " should search as well as
+      // "nixos" does.
       clearTimeout(searchTimer);
-      if (q.length > 5 && window.emacsBlog.search) {
+      if (q && (q.length > 5 || v.indexOf(" ") !== -1) && window.emacsBlog.search) {
         searchTimer = setTimeout(function () {
           if (inp.value.trim() !== q) return; // query changed since scheduling
           window.emacsBlog.search.load(function () {
@@ -545,11 +455,13 @@
     }
   });
   dlg.addEventListener("click", function (e) {
-    if (e.target === dlg) {
-      snapRestore();
-      dlg.close();
-    }
+    if (e.target === dlg) dlg.close();
   });
+
+  // Fires on every close path — explicit .close(), backdrop click, and
+  // native Escape alike — so a live scheme preview never survives closing
+  // the dialog no matter how it was dismissed.
+  dlg.addEventListener("close", snapRestore);
 
   function open(prefix) {
     dlg.showModal();
@@ -563,11 +475,7 @@
   window.emacsBlog.palette = {
     open: open,
     close: function () {
-      snapRestore();
       dlg.close();
-    },
-    isOpen: function () {
-      return dlg.open;
     },
     clearCustomPalette: clearCustomPalette,
     applyCustomPalette: applyCustomPalette,

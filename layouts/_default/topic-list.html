@@ -71,17 +71,19 @@
             spellcheck="false"
           />
           <span id="topic-count" class="list-search-count"></span>
-          {{- /* List / grid view toggle (persisted in JS). Glyph is a placeholder. */ -}}
-          <button
+          {{- /* List / grid view toggle: a real checkbox, grid layout is pure
+            CSS (:has(#view-toggle:checked)); JS only persists the choice.
+            Glyph is a placeholder. */ -}}
+          <input
+            type="checkbox"
             id="view-toggle"
-            class="tag-cloud-btn"
-            type="button"
+            class="view-toggle-input"
             aria-label="Toggle list / grid view"
-            aria-pressed="false"
             title="Toggle list / grid view"
-          >
+          />
+          <label for="view-toggle" class="tag-cloud-btn">
             <span class="nf" aria-hidden="true">󰕰 </span>
-          </button>
+          </label>
         </div>
 
         <ul class="article-list wander-list" id="article-list" role="list">
