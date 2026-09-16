@@ -434,11 +434,8 @@ themes/emacs/
 │   ├── css/
 │   │   ├── theme.css        # everything: @layer tokens, base, components, chrome, overrides
 │   │   └── custom.css       # site-root override slot (@font-face + font vars)
-│   └── js/                  # bundled → app.js (deferred)
-│       ├── keyboard.js      # vim/emacs keys, scroll utils, code-copy, lightbox
-│       ├── menu.js          # theme toggle, scheme popup, font/width/align cycling
-│       ├── palette.js       # command palette (x)
-│       └── themes-gallery.js # /themes/ grid: hover preview, click to apply + pin
+│   └── js/
+│       └── index.js          # keyboard, menu, search, palette, themes-gallery -- one file, deferred
 ├── layouts/
 │   ├── _default/
 │   │   ├── baseof.html      # shell: data-theme/data-scheme, menu, echo area, dialogs
@@ -559,7 +556,7 @@ Added or replaced after forking from
 | *Unified listings*         | One =topic-list= layout powers Wander / Projects / Media via front matter, not directory convention |
 | *Themes gallery + sitemap* | =/themes/= live scheme gallery and auto-generated =/sitemap/=, both new generic layouts               |
 | *CSS*                      | ~1000 lines of dead code removed; oklch color mixins                                              |
-| *JS bundle*                | 4 files → 1 deferred =app.js=                                                                       |
+| *JS bundle*                | 5 files → 1 deferred =index.js=                                                                      |
 
 --------------
 
