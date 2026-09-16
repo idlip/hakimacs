@@ -1484,7 +1484,6 @@
   .list-footer {
     border-top: 1px solid var(--border-dim);
     padding: 0.75em 1em;
-    font-size: var(--fs-2xs);
     color: var(--fg-dim);
     text-align: center;
     & a {
