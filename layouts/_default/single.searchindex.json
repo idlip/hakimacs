@@ -9,8 +9,10 @@
   {{- range split $marked $sep -}}
     {{- $text := strings.TrimSpace . -}}
     {{- if gt (len $text) 3 -}}
-      {{- $tokens := ($text | lower | findRE `[a-z0-9]+`) | default (slice) -}}
-      {{- $items = $items | append (dict "title" $title "url" $url "text" $text "tokens" $tokens) -}}
+      {{- /* No tokens array (decision 19's polish cut, synced from
+        denden-search-index-json, 2026-09-17/18 session): the client
+        (search.js) matches words against :text directly. */ -}}
+      {{- $items = $items | append (dict "title" $title "url" $url "text" $text) -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}

@@ -1,0 +1,71 @@
+{{- /* home-latest-table.html -- the "Treasure this island has to offer"
+  table (One Piece naming, 2026-09-16/17 session), synced from denden's
+  content/_index.org Emacs Lisp Babel block, which go-org cannot evaluate
+  (renders as a literal source block otherwise). Same technique
+  topic-list.html/pose.html already use: split rendered .Content on <h2,
+  reuse parse-dl.html for each dt/dd pair -- no new parsing mechanism.
+  Called from index.html; . is the home page. */ -}}
+
+{{- /* Log: latest posts-section page. */ -}}
+{{- $postCell := "none yet" -}}
+{{- range first 1 (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+  {{- $postCell = printf "<a href=%q>%s</a> (%s)" .RelPermalink .Title (.Date.Format "02 Jan 2006") -}}
+{{- end -}}
+
+{{- /* Pose: the owner prepends new entries, so the FIRST ** entry (the
+  first <h2 chunk) in pose.org is the newest -- opposite of wander.org's
+  own append-at-the-end convention below. */ -}}
+{{- $poseCell := "none yet" -}}
+{{- with site.GetPage "/pose" }}
+  {{- $chunks := split .Content "<h2" -}}
+  {{- if gt (len $chunks) 1 }}
+    {{- $chunk := printf "<h2%s" (index $chunks 1) -}}
+    {{- $entryDate := $chunk | replaceRE `(?s)^<h2[^>]*>(.*?)</h2>.*` "$1" | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
+    {{- $body := $chunk | replaceRE `(?s)^<h2[^>]*>.*?</h2>` "" | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
+    {{- if gt (len $body) 100 }}{{- $body = printf "%s…" (substr $body 0 100) -}}{{- end -}}
+    {{- $poseCell = printf "<a href=\"/pose/\">%s</a> — %s" $entryDate $body -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Wander: last item of the last group -- append-at-the-end convention. */ -}}
+{{- $wanderCell := "none yet" -}}
+{{- with site.GetPage "/wander" }}
+  {{- $groups := after 1 (split .Content "<h2") -}}
+  {{- if gt (len $groups) 0 }}
+    {{- $lastGroup := index $groups (sub (len $groups) 1) -}}
+    {{- $dts := findRE `<dt>(?s:.*?)</dt>` $lastGroup -}}
+    {{- $dds := findRE `<dd>(?s:.*?)</dd>` $lastGroup -}}
+    {{- if gt (len $dts) 0 }}
+      {{- $item := partial "parse-dl.html" (dict "dt" (index $dts (sub (len $dts) 1)) "dd" (index $dds (sub (len $dds) 1))) -}}
+      {{- $wanderCell = printf "<a href=%q>%s</a>" $item.url $item.name -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Media: several thematic groups (Talks/Books/Movies/Anime/YouTube) a
+  new item could land in any -- unlike Wander, "last item in the whole
+  file" is unreliable, so one row per group, each its own last item. */ -}}
+{{- $mediaRows := "" -}}
+{{- with site.GetPage "/media" }}
+  {{- $groups := after 1 (split .Content "<h2") -}}
+  {{- range $groups }}
+    {{- $group := printf "<h2%s" . -}}
+    {{- $label := $group | replaceRE `(?s)^<h2[^>]*>(.*?)</h2>.*` "$1" | replaceRE `<[^>]+>` "" | strings.TrimSpace -}}
+    {{- $dts := findRE `<dt>(?s:.*?)</dt>` $group -}}
+    {{- $dds := findRE `<dd>(?s:.*?)</dd>` $group -}}
+    {{- $cell := "none yet" -}}
+    {{- if gt (len $dts) 0 }}
+      {{- $item := partial "parse-dl.html" (dict "dt" (index $dts (sub (len $dts) 1)) "dd" (index $dds (sub (len $dds) 1))) -}}
+      {{- $cell = printf "<a href=%q>%s</a>" $item.url $item.name -}}
+    {{- end -}}
+    {{- $mediaRows = printf "%s<tr><td><a href=\"/media/\">%s</a></td><td>%s</td></tr>" $mediaRows $label $cell -}}
+  {{- end -}}
+{{- end -}}
+
+<table>
+  <tr><th>One</th><th>Piece</th></tr>
+  <tr><td><a href="/posts/">Log</a></td><td>{{ $postCell | safeHTML }}</td></tr>
+  <tr><td><a href="/pose/">Pose</a></td><td>{{ $poseCell | safeHTML }}</td></tr>
+  <tr><td><a href="/wander/">Wander</a></td><td>{{ $wanderCell | safeHTML }}</td></tr>
+  {{ $mediaRows | safeHTML }}
+</table>

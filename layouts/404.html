@@ -15,11 +15,22 @@
       <div class="post-body">
         <p><code>Symbol's value as variable is void: {{ .RelPermalink }}</code></p>
 
-        <p>This page doesn't exist :: not now, not ever, not in any buffer. Even <b>Roronoa Zoro</b> would've found his way here faster. Here's where you probably meant to go:</p>
+        {{- /* WANTED-poster gag (synced from denden's site--404-wanted-poster,
+          2026-09-16/17 session) -- "Last seen" is filled by the script below
+          since a static 404.html has no way to know the actually-mistyped
+          path at build time. */ -}}
+        <div class="wanted-poster">
+          <p class="wanted-poster-heading">WANTED</p>
+          <p class="wanted-poster-subject">Page D. Notfound</p>
+          <p class="wanted-poster-tag">DEAD OR ALIVE</p>
+          <p>Bounty: 404,069,420</p>
+          <p>Last seen: <code id="wanted-lastseen">parts unknown</code></p>
+          <p class="wanted-poster-footer">Even <b>Roronoa Zoro</b> would've found his way here faster.</p>
+        </div>
 
         <ul>
-          <li><a href="{{ "/" | relLangURL }}">Home</a> <kbd>g</kbd> <kbd>h</kbd></li>
-          <li><a href="{{ "/posts/" | relLangURL }}">Posts</a> <kbd>g</kbd> <kbd>p</kbd></li>
+          <li><a href="{{ "/" | relLangURL }}">Home</a></li>
+          <li><a href="{{ "/posts/" | relLangURL }}">Posts</a></li>
           <li>
             Latest:
             {{- range (first 1 (where .Site.RegularPages "Section" "posts").ByDate.Reverse) }}
@@ -30,6 +41,7 @@
 
         <p>Or open the command palette for everything else:</p>
         <button type="button" class="tag-cloud-btn center" data-action="open-palette">M-x (:Command palette)</button>
+        <script>document.getElementById('wanted-lastseen').textContent = window.location.pathname;</script>
       </div>
     </article>
   </div>

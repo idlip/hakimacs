@@ -1,1 +1,16 @@
-{{- partial "atom-body.xml" . -}}
+{{- /* Redirect to Index (decision 7's polish cut, synced from denden's
+  site-write-feed-trio, 2026-09-17/18 session): three identical Atom files
+  become one real one -- index.xml -- with rss.xml/feed.xml kept alive only
+  for whoever already bookmarked or subscribed to them. Same shape as
+  denden-alias-redirect-html. */ -}}
+{{- $target := (.OutputFormats.Get "Index").Permalink -}}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ $target }}</title>
+    <link rel="canonical" href="{{ $target }}"/>
+    <meta name="robots" content="noindex">
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url={{ $target }}">
+  </head>
+</html>
