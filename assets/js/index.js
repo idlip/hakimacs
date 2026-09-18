@@ -647,23 +647,17 @@
     if (!words.length) return [];
     return index
       .filter(function (item) {
-        var tokens = item.tokens || [];
+        var lo = item.text.toLowerCase();
         return words.every(function (w) {
-          return tokens.some(function (t) {
-            return t.indexOf(w) !== -1;
-          });
+          return lo.indexOf(w) !== -1;
         });
       })
       .map(function (item) {
-        var tokens = item.tokens || [];
-        var hit = tokens.find(function (t) {
-          return t.indexOf(words[0]) !== -1;
-        });
         return {
           title: item.title,
           url: item.url,
           snippet: item.text,
-          hit: hit || words[0],
+          hit: item.text,
         };
       });
   }

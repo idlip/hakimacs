@@ -1,0 +1,38 @@
+{{ define "main" }}
+{{- /* Pose layout -- one page of short-form entries (a sentence to a
+       couple paragraphs each), no per-entry permalink: activate via Org
+       front matter #+layout: pose. Same split-on-<h2 chunking topic-
+       list.html uses (each H2 -- one entry -- becomes its own chunk),
+       just rendered as a plain full-width list, one card per entry, not
+       topic-list's grid/dt-dl link shape -- these are free-form
+       paragraphs, not links. */ -}}
+{{- $chunks := split .Content "<h2" -}}
+<section class="buffer buffer-content active"
+         id="buffer-content"
+         role="region"
+         aria-label="{{ .Title }}">
+  <div class="buffer-body">
+    <article class="post-content">
+      <div class="post-header">
+        <h1 class="post-title">{{ .Title }}</h1>
+      </div>
+
+      {{- with index $chunks 0 }}
+        <div class="post-body">{{ . | safeHTML }}</div>
+      {{- end }}
+
+      <ul class="pose-list">
+        {{- range after 1 $chunks }}
+          <li class="pose-card">{{ printf "<h2%s" . | replaceRE `<img ` `<img loading="lazy" decoding="async" ` | safeHTML }}</li>
+        {{- end }}
+      </ul>
+    </article>
+    <footer>{{ partial "footer" . }}</footer>
+  </div>
+
+  {{ partial "modeline.html" (dict
+    "buffer" (printf "*%s*" (.Title | lower))
+    "date"   (cond (not .Date.IsZero) (.Date.Format "2006-01-02") (now.Format "2006-01-02"))
+  ) }}
+</section>
+{{ end }}
